@@ -1,0 +1,45 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Log in to your CampusGenius student account.">
+  <title>Login | CampusGenius</title>
+  <link rel="stylesheet" href="../css/style.css">
+  <script src="../js/script.js" defer></script>
+</head>
+<body>
+  <main class="form-page">
+    <section class="form-card">
+      <a class="brand" href="../index.html"><span>CG</span> CampusGenius</a>
+
+      <h1>Welcome back</h1>
+      <p class="form-intro">Log in to continue your academic journey.</p>
+
+      <form data-demo-form>
+        <div class="form-group">
+          <label for="email">Email address</label>
+          <input id="email" name="email" type="email"
+                 autocomplete="email" placeholder="you@example.com" required>
+        </div>
+
+        <div class="form-group">
+          <label for="password">Password</label>
+          <input id="password" name="password" type="password"
+                 autocomplete="current-password" placeholder="Enter your password" required>
+        </div>
+
+        <button class="btn" type="submit">Log In</button>
+        <p class="form-message" role="status" aria-live="polite"></p>
+      </form>
+
+      <p class="form-bottom">
+        Don't have an account? <a href="register.html">Create one</a>
+      </p>
+
+      <a class="back-home" href="../index.html">← Back to homepage</a>
+    </section>
+  </main>
+</body>
+</html>
