@@ -2,95 +2,294 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Student Dashboard | CampusGenius</title>
-  <link rel="stylesheet" href="../css/style.css">
-  <style>
-    body { background: #f5f8f6; }
-    .dashboard { max-width: 1050px; margin: 35px auto; padding: 20px; }
-    .welcome {
-      background: #0a7f3f; color: white; padding: 28px;
-      border-radius: 14px; margin-bottom: 25px;
-    }
-    .dashboard-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-      gap: 18px;
-    }
-    .dash-card {
-      background: white; padding: 22px; border-radius: 12px;
-      box-shadow: 0 3px 12px #0000000c;
-    }
-    .dash-card h2 { color: #0a7f3f; font-size: 20px; }
-    .dash-card a { color: #0a7f3f; font-weight: bold; }
-    .logout {
-      background: white; color: #0a7f3f; border: 0;
-      padding: 10px 18px; border-radius: 6px; cursor: pointer;
-      font-weight: bold;
-    }
-  </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Student Dashboard | CampusGenius</title>
+<style>
+:root{--green:#08783b;--dark:#123526;--light:#f3f7f4;--muted:#66776d;--white:#fff}
+*{box-sizing:border-box}
+body{margin:0;font-family:Arial,sans-serif;background:var(--light);color:var(--dark)}
+button,input,select{font:inherit}
+a{text-decoration:none;color:inherit}
+.layout{display:flex;min-height:100vh}
+.sidebar{width:245px;background:#fff;border-right:1px solid #e4ece6;padding:24px 16px;flex-shrink:0}
+.brand{font-size:25px;font-weight:800;color:var(--green);padding:8px}
+.brand span{color:var(--dark)}
+.brand small{display:block;font-size:11px;color:var(--muted);font-weight:400;margin-top:6px}
+.nav-title{font-size:11px;color:#87948c;font-weight:bold;margin:28px 10px 10px}
+.nav a{display:block;padding:12px 13px;border-radius:9px;margin:4px 0;font-size:14px;color:#506157}
+.nav a:hover,.nav a.active{background:#e9f5ed;color:var(--green);font-weight:bold}
+.main{flex:1;min-width:0;padding:25px 30px 40px}
+.topbar{display:flex;justify-content:space-between;align-items:center;gap:15px;margin-bottom:25px}
+.topbar h1{font-size:24px;margin:0 0 7px}
+.muted{color:var(--muted);font-size:14px}
+.profile{background:#fff;border:1px solid #e2ebe4;padding:10px 14px;border-radius:30px;font-size:13px}
+.hero{background:linear-gradient(120deg,#075e31,#119653);color:#fff;border-radius:18px;padding:28px;display:flex;align-items:center;justify-content:space-between;gap:20px;margin-bottom:24px}
+.hero h2{font-size:27px;margin:0 0 10px}
+.hero p{line-height:1.6;max-width:500px;margin:0 0 18px;color:#e7f6ec}
+.btn{display:inline-block;background:#fff;color:#086b36;padding:11px 16px;border:0;border-radius:8px;font-weight:bold;cursor:pointer}
+.btn-green{background:var(--green);color:#fff}
+.hero-icon{font-size:75px}
+.section-head{display:flex;justify-content:space-between;align-items:center;margin:27px 0 14px;gap:12px}
+.section-head h2{font-size:19px;margin:0}
+.section-head a{font-size:13px;color:var(--green);font-weight:bold}
+.grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:15px}
+.card{background:#fff;border:1px solid #e5ece7;border-radius:13px;padding:19px;min-width:0}
+.card:hover{border-color:#9acbab}
+.card-icon{width:43px;height:43px;border-radius:12px;background:#e9f5ed;display:grid;place-items:center;font-size:22px;margin-bottom:15px}
+.card h3{font-size:16px;margin:0 0 9px}
+.card p{font-size:13px;line-height:1.55;color:var(--muted);margin:0 0 15px}
+.card a{font-size:13px;font-weight:bold;color:var(--green)}
+.featured{grid-column:span 2}
+.quick-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:15px}
+.panel{background:#fff;border:1px solid #e5ece7;border-radius:13px;padding:20px}
+.panel h3{margin:0 0 10px;font-size:16px}
+.panel p{font-size:13px;color:var(--muted);line-height:1.5}
+.panel label{display:block;font-size:13px;margin:12px 0 6px}
+.panel input,.panel select{width:100%;padding:11px;border:1px solid #dce5de;border-radius:7px;background:white}
+.result{font-weight:bold;color:var(--green);margin-top:12px}
+.notice{background:#fff7e6;border:1px solid #f2dfb3;border-radius:10px;padding:14px;font-size:13px;line-height:1.5;color:#715520;margin-top:18px}
+footer{text-align:center;color:#87948c;font-size:12px;margin-top:35px}
+.mobile-menu{display:none}
+@media(max-width:1100px){.grid{grid-template-columns:repeat(2,minmax(0,1fr))}.quick-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:700px){.sidebar{display:none}.main{padding:18px 14px 30px}.topbar h1{font-size:20px}.hero{padding:22px}.hero h2{font-size:23px}.hero-icon{font-size:48px}.grid,.quick-grid{grid-template-columns:1fr 1fr}.featured{grid-column:span 2}}
+@media(max-width:420px){.grid,.quick-grid{grid-template-columns:1fr}.featured{grid-column:span 1}.hero-icon{display:none}.profile{font-size:11px}}
+</style>
 </head>
 <body>
-  <main class="dashboard">
-    <div class="welcome">
-      <h1>Welcome, <span id="studentName">Student</span>!</h1>
-      <p>Your learning journey starts here. Learn Today. Lead Tomorrow.</p>
-      <button class="logout" id="logoutButton">Log Out</button>
+<div class="layout">
+<aside class="sidebar">
+  <div class="brand">Campus<span>Genius</span><small>Learn Today. Lead Tomorrow.</small></div>
+  <div class="nav-title">STUDENT MENU</div>
+  <nav class="nav">
+    <a class="active" href="dashboard.html">🏠 Dashboard</a>
+    <a href="ai-tutor.html">🤖 AI Tutor</a>
+    <a href="cbt.html">📝 JAMB CBT Practice</a>
+    <a href="past-questions.html">📚 Past Questions</a>
+    <a href="study-planner.html">🗓️ Study Planner</a>
+    <a href="cgpa.html">🎓 CGPA Calculator</a>
+    <a href="scholarships.html">💰 Scholarships</a>
+    <a href="learning-materials.html">📖 Learning Materials</a>
+    <a href="career-guidance.html">🧭 Career Guidance</a>
+  </nav>
+  <div class="nav-title">ACCOUNT</div>
+  <nav class="nav">
+    <a href="earnings.html">💵 Student Earnings</a>
+    <a href="#" id="logoutLink">↪ Log Out</a>
+  </nav>
+</aside>
+
+<main class="main">
+  <header class="topbar">
+    <div>
+      <h1>Student Dashboard</h1>
+      <div class="muted">Your learning journey, all in one place.</div>
     </div>
+    <div class="profile">👤 <span id="studentName">Student</span></div>
+  </header>
 
-    <h2>Your Student Hub</h2>
-
-    <div class="dashboard-grid">
-      <section class="dash-card">
-        <h2>Past Questions</h2>
-        <p>Prepare for your examinations with past questions.</p>
-        <a href="past-questions.html">Explore Past Questions</a>
-      </section>
-
-      <section class="dash-card">
-        <h2>CBT Practice</h2>
-        <p>Practise questions and assess your knowledge.</p>
-        <a href="cbt.html">Start CBT Practice</a>
-      </section>
-
-      <section class="dash-card">
-        <h2>Scholarships</h2>
-        <p>Discover scholarship opportunities for students.</p>
-        <a href="scholarships.html">Find Scholarships</a>
-      </section>
-
-      <section class="dash-card">
-        <h2>CGPA Calculator</h2>
-        <p>Calculate your grade point average.</p>
-        <a href="cgpa.html">Open Calculator</a>
-      </section>
+  <section class="hero">
+    <div>
+      <h2>Learn smarter. Achieve more. 🎯</h2>
+      <p>Practise for exams, learn with AI, organise your study time and discover opportunities for your future.</p>
+      <a class="btn" href="ai-tutor.html">Explore AI Tutor →</a>
     </div>
-  </main>
+    <div class="hero-icon">🎓</div>
+  </section>
 
-  <script>
-    const token = sessionStorage.getItem("campusgenius_token");
-    const studentText = sessionStorage.getItem("campusgenius_student");
+  <div class="section-head"><h2>Your Learning Hub</h2></div>
+  <section class="grid">
+    <article class="card">
+      <div class="card-icon">🤖</div>
+      <h3>AI Tutor</h3>
+      <p>Get explanations and learning support across subjects and education levels.</p>
+      <a href="ai-tutor.html">Meet your tutor →</a>
+    </article>
+    <article class="card">
+      <div class="card-icon">📝</div>
+      <h3>JAMB CBT</h3>
+      <p>Practise UTME-style questions and review your answers.</p>
+      <a href="cbt.html">Start practice →</a>
+    </article>
+    <article class="card">
+      <div class="card-icon">📚</div>
+      <h3>WAEC & NECO</h3>
+      <p>Find examination practice resources organised by subject and year.</p>
+      <a href="past-questions.html">Browse questions →</a>
+    </article>
+    <article class="card">
+      <div class="card-icon">🏫</div>
+      <h3>University Resources</h3>
+      <p>Organise course notes and past questions for your institution.</p>
+      <a href="learning-materials.html">Explore resources →</a>
+    </article>
+    <article class="card">
+      <div class="card-icon">🗓️</div>
+      <h3>Study Planner</h3>
+      <p>Plan reading sessions, set study goals and manage your time.</p>
+      <a href="study-planner.html">Plan your week →</a>
+    </article>
+    <article class="card">
+      <div class="card-icon">🎓</div>
+      <h3>CGPA Calculator</h3>
+      <p>Calculate your GPA and track your academic performance.</p>
+      <a href="cgpa.html">Calculate CGPA →</a>
+    </article>
+    <article class="card">
+      <div class="card-icon">💰</div>
+      <h3>Scholarships</h3>
+      <p>Discover funding opportunities and application guidance.</p>
+      <a href="scholarships.html">Find opportunities →</a>
+    </article>
+    <article class="card">
+      <div class="card-icon">🧭</div>
+      <h3>Career Guidance</h3>
+      <p>Explore careers, skills and possible academic pathways.</p>
+      <a href="career-guidance.html">Explore careers →</a>
+    </article>
+    <article class="card">
+      <div class="card-icon">💵</div>
+      <h3>Student Earnings</h3>
+      <p>Explore legitimate student-friendly opportunities and services.</p>
+      <a href="earnings.html">Explore opportunities →</a>
+    </article>
+    <article class="card">
+      <div class="card-icon">🗒️</div>
+      <h3>Notes & Flashcards</h3>
+      <p>Build revision notes and practise recalling key concepts.</p>
+      <a href="learning-materials.html">Start revising →</a>
+    </article>
+  </section>
 
-    if (!token || !studentText) {
-      window.location.replace("login.html");
-    } else {
-      try {
-        const student = JSON.parse(studentText);
-        document.getElementById("studentName").textContent =
-          student.full_name || "Student";
-      } catch (error) {
-        sessionStorage.removeItem("campusgenius_token");
-        sessionStorage.removeItem("campusgenius_student");
-        window.location.replace("login.html");
-      }
+  <div class="section-head"><h2>Quick Tools</h2></div>
+  <section class="quick-grid">
+    <div class="panel">
+      <h3>⏱️ Focus Timer</h3>
+      <p>Try a 25-minute study session, followed by a short break.</p>
+      <button class="btn btn-green" id="timerButton" type="button">Start 25:00</button>
+      <div class="result" id="timerDisplay">25:00</div>
+    </div>
+    <div class="panel">
+      <h3>📅 Plan a Study Session</h3>
+      <p>Make a simple study reminder for yourself.</p>
+      <label for="studySubject">Subject or course</label>
+      <input id="studySubject" placeholder="e.g. Biology">
+      <label for="studyTime">Study date and time</label>
+      <input id="studyTime" type="datetime-local">
+      <button class="btn btn-green" id="saveStudy" type="button" style="margin-top:12px">Save Reminder</button>
+      <div class="result" id="studyResult"></div>
+    </div>
+    <div class="panel">
+      <h3>🧮 Quick GPA</h3>
+      <p>Estimate a semester GPA using total quality points and credit units.</p>
+      <label for="qualityPoints">Total quality points</label>
+      <input id="qualityPoints" type="number" min="0" step="0.01" placeholder="e.g. 48">
+      <label for="creditUnits">Total credit units</label>
+      <input id="creditUnits" type="number" min="1" step="1" placeholder="e.g. 18">
+      <button class="btn btn-green" id="calculateGpa" type="button" style="margin-top:12px">Calculate GPA</button>
+      <div class="result" id="gpaResult"></div>
+    </div>
+  </section>
+
+  <div class="notice">
+    <strong>Important:</strong> Some menu items are navigation links for features we will build next. AI tutoring, exam archives, payments and earning tools are not active until their pages and services are connected. Always verify scholarship offers and avoid opportunities that demand suspicious upfront fees.
+  </div>
+  <footer>© 2026 CampusGenius · Nigeria’s Student Learning Platform</footer>
+</main>
+</div>
+
+<script>
+(function(){
+  const token=sessionStorage.getItem("campusgenius_token");
+  const studentText=sessionStorage.getItem("campusgenius_student");
+
+  if(!token||!studentText){
+    window.location.replace("login.html");
+    return;
+  }
+
+  try{
+    const student=JSON.parse(studentText);
+    document.getElementById("studentName").textContent=
+      student.full_name||student.fullName||"Student";
+  }catch(e){
+    sessionStorage.removeItem("campusgenius_token");
+    sessionStorage.removeItem("campusgenius_student");
+    window.location.replace("login.html");
+    return;
+  }
+
+  function logout(){
+    sessionStorage.removeItem("campusgenius_token");
+    sessionStorage.removeItem("campusgenius_student");
+    window.location.replace("login.html");
+  }
+  document.getElementById("logoutLink").addEventListener("click",function(e){
+    e.preventDefault();logout();
+  });
+
+  let remaining=1500;
+  let timer=null;
+  const timerDisplay=document.getElementById("timerDisplay");
+  const timerButton=document.getElementById("timerButton");
+
+  function showTime(){
+    const m=String(Math.floor(remaining/60)).padStart(2,"0");
+    const s=String(remaining%60).padStart(2,"0");
+    timerDisplay.textContent=m+":"+s;
+  }
+  timerButton.addEventListener("click",function(){
+    if(timer){
+      clearInterval(timer);timer=null;
+      timerButton.textContent="Resume "+timerDisplay.textContent;
+      return;
     }
+    if(remaining<=0)remaining=1500;
+    timerButton.textContent="Pause Timer";
+    timer=setInterval(function(){
+      remaining--;
+      showTime();
+      if(remaining<=0){
+        clearInterval(timer);timer=null;
+        timerButton.textContent="Start Again";
+        timerDisplay.textContent="Session complete!";
+        alert("Well done! You completed your focus session.");
+      }
+    },1000);
+  });
 
-    document.getElementById("logoutButton").addEventListener("click", () => {
-      sessionStorage.removeItem("campusgenius_token");
-      sessionStorage.removeItem("campusgenius_student");
-      window.location.replace("login.html");
-    });
-  </script>
+  document.getElementById("saveStudy").addEventListener("click",function(){
+    const subject=document.getElementById("studySubject").value.trim();
+    const time=document.getElementById("studyTime").value;
+    const result=document.getElementById("studyResult");
+    if(!subject||!time){
+      result.textContent="Enter a subject and date/time.";
+      return;
+    }
+    const date=new Date(time);
+    if(Number.isNaN(date.getTime())){
+      result.textContent="Please enter a valid date and time.";
+      return;
+    }
+    const reminders=JSON.parse(localStorage.getItem("campusgenius_study_reminders")||"[]");
+    reminders.push({subject:subject,time:time});
+    localStorage.setItem("campusgenius_study_reminders",JSON.stringify(reminders));
+    result.textContent="Reminder saved on this device for "+date.toLocaleString()+".";
+  });
+
+  document.getElementById("calculateGpa").addEventListener("click",function(){
+    const qp=Number(document.getElementById("qualityPoints").value);
+    const cu=Number(document.getElementById("creditUnits").value);
+    const result=document.getElementById("gpaResult");
+    if(document.getElementById("qualityPoints").value===""||
+       document.getElementById("creditUnits").value===""||
+       qp<0||cu<=0){
+      result.textContent="Enter valid quality points and credit units.";
+      return;
+    }
+    result.textContent="Estimated GPA: "+(qp/cu).toFixed(2);
+  });
+})();
+</script>
 </body>
 </html>
