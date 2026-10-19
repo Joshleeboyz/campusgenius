@@ -1,0 +1,344 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Career Guidance | CampusGenius</title>
+<style>
+*{box-sizing:border-box}
+body{margin:0;font-family:Arial,sans-serif;background:#f3f7f4;color:#183729}
+header{background:#08783b;color:white;padding:18px 5%;display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap}
+header a{color:white;text-decoration:none;font-weight:bold}
+main{max-width:1050px;margin:30px auto;padding:0 16px}
+h1{margin-bottom:8px}
+.muted{color:#65766a;line-height:1.65}
+.panel,.career{background:white;border:1px solid #e0e9e2;border-radius:13px;padding:20px}
+.panel{margin:20px 0}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(245px,1fr));gap:15px;margin:18px 0}
+.career{display:flex;flex-direction:column;gap:10px}
+.career h3{margin:0;color:#08783b}
+.tag{display:inline-block;width:max-content;background:#e8f4ec;color:#08783b;padding:5px 9px;border-radius:20px;font-size:12px;font-weight:bold}
+label{display:block;font-weight:bold;font-size:14px;margin:12px 0 7px}
+input,select,textarea{width:100%;padding:11px;border:1px solid #d4e0d7;border-radius:8px;font:inherit;background:white}
+button,.btn{display:inline-block;background:#08783b;color:white;border:0;border-radius:8px;padding:11px 14px;font-weight:bold;text-decoration:none;cursor:pointer;font-size:14px}
+button.secondary{background:#64766a}
+button.delete{background:#a52d2d}
+.actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}
+.career .btn{margin-top:auto;text-align:center}
+.small{font-size:12px;color:#65766a;line-height:1.6}
+.output{background:#e8f4ec;border-radius:10px;padding:16px;margin-top:15px;line-height:1.7;white-space:pre-wrap}
+.empty{background:white;border-radius:12px;padding:22px;color:#65766a}
+@media(max-width:600px){main{margin-top:20px}.panel,.career{padding:15px}}
+</style>
+</head>
+<body>
+<header>
+<strong>CampusGenius | Career Guidance</strong>
+<a href="dashboard.html">← Dashboard</a>
+</header>
+
+<main>
+<h1>Build Your Future 🚀</h1>
+<p class="muted">Explore possible careers, identify skills to develop and organise your preparation for employment.</p>
+
+<section class="panel">
+<h2>Explore career paths</h2>
+<p class="muted">These are examples of career areas, not guarantees of employment. Qualifications and licensing requirements vary by role and country.</p>
+<div class="grid" id="careers"></div>
+</section>
+
+<section class="panel">
+<h2>Personal career planner</h2>
+<p class="muted">Enter your interests and current skills to create a practical starting plan.</p>
+
+<label for="course">Course or field of study</label>
+<input id="course" placeholder="e.g. Health Information Management">
+
+<label for="year">Current study level</label>
+<select id="year">
+<option>100 Level</option>
+<option>200 Level</option>
+<option>300 Level</option>
+<option>400 Level</option>
+<option>500 Level or above</option>
+<option>Graduate</option>
+</select>
+
+<label for="interest">Career area of interest</label>
+<select id="interest">
+<option value="health">Healthcare and health information</option>
+<option value="technology">Technology and data</option>
+<option value="business">Business and administration</option>
+<option value="education">Education and research</option>
+<option value="undecided">Still exploring</option>
+</select>
+
+<label for="skills">Skills you already have</label>
+<textarea id="skills" rows="3" placeholder="e.g. communication, Microsoft Word, teamwork"></textarea>
+
+<label for="goal">Your main career goal</label>
+<textarea id="goal" rows="2" placeholder="e.g. secure an internship before graduation"></textarea>
+
+<div class="actions">
+<button id="generate">Create my career plan</button>
+<button id="savePlan" class="secondary">Save my plan</button>
+</div>
+
+<div id="plan" class="output" hidden aria-live="polite"></div>
+<p id="message" class="muted" aria-live="polite"></p>
+</section>
+
+<section class="panel">
+<h2>CV preparation checklist</h2>
+<p class="muted">Use this checklist to track your CV preparation on this device.</p>
+<div id="checklist"></div>
+<div class="actions">
+<button id="saveChecklist">Save checklist</button>
+<button id="resetChecklist" class="secondary">Reset checklist</button>
+</div>
+<p class="small">Your checklist is stored in this browser, not shared with employers.</p>
+</section>
+
+<section class="panel">
+<h2>Find internship and learning opportunities</h2>
+<p class="muted">Start with established career and professional platforms. Check listings, eligibility, deadlines and application URLs carefully before sharing personal information.</p>
+<div class="grid">
+<article class="career">
+<h3>LinkedIn Jobs</h3>
+<p class="muted">Search for internships, entry-level jobs and opportunities relevant to your field.</p>
+<a class="btn" href="https://www.linkedin.com/jobs/" target="_blank" rel="noopener noreferrer">Explore jobs ↗</a>
+</article>
+<article class="career">
+<h3>Jobberman Nigeria</h3>
+<p class="muted">Explore Nigerian job listings and career resources.</p>
+<a class="btn" href="https://www.jobberman.com/" target="_blank" rel="noopener noreferrer">Visit Jobberman ↗</a>
+</article>
+<article class="career">
+<h3>Microsoft Learn</h3>
+<p class="muted">Study technology topics and develop digital skills using learning modules.</p>
+<a class="btn" href="https://learn.microsoft.com/training/" target="_blank" rel="noopener noreferrer">Explore learning ↗</a>
+</article>
+<article class="career">
+<h3>Google Career Certificates</h3>
+<p class="muted">Explore professional training programmes and certificate information.</p>
+<a class="btn" href="https://grow.google/certificates/" target="_blank" rel="noopener noreferrer">Explore certificates ↗</a>
+</article>
+</div>
+<p class="small">CampusGenius does not control these external platforms and cannot guarantee vacancies, admissions, certificates or employment.</p>
+</section>
+</main>
+
+<script>
+const careerData=[
+{
+ title:"Health Information Management",
+ tag:"Healthcare",
+ desc:"Organise health records, support data quality and help healthcare organisations manage information.",
+ skills:["Health-records management","Data confidentiality","Medical terminology","Excel and data entry"],
+ search:"health information management"
+},
+{
+ title:"Health Data and Analytics",
+ tag:"Health + Technology",
+ desc:"Work with health data to support reporting, research and evidence-informed decisions.",
+ skills:["Excel","Statistics","Data visualisation","Research methods"],
+ search:"health data analyst"
+},
+{
+ title:"Software and Web Development",
+ tag:"Technology",
+ desc:"Build and maintain websites, applications and digital services.",
+ skills:["HTML and CSS","JavaScript","Problem-solving","Git and GitHub"],
+ search:"web developer"
+},
+{
+ title:"Data Analysis",
+ tag:"Technology",
+ desc:"Collect, clean and analyse information to answer questions and support decisions.",
+ skills:["Excel","SQL","Statistics","Data visualisation"],
+ search:"data analyst"
+},
+{
+ title:"Healthcare Administration",
+ tag:"Administration",
+ desc:"Support operations, scheduling, reporting and service coordination in healthcare settings.",
+ skills:["Communication","Organisation","Record keeping","Computer literacy"],
+ search:"healthcare administrator"
+},
+{
+ title:"Teaching and Research",
+ tag:"Education",
+ desc:"Support learning, educational projects, research and academic communication.",
+ skills:["Writing","Presentation","Research methods","Critical thinking"],
+ search:"education research assistant"
+}
+];
+
+const careers=document.getElementById("careers");
+
+careerData.forEach(item=>{
+ const card=document.createElement("article");
+ card.className="career";
+ const tag=document.createElement("span");
+ tag.className="tag";
+ tag.textContent=item.tag;
+ const title=document.createElement("h3");
+ title.textContent=item.title;
+ const desc=document.createElement("p");
+ desc.className="muted";
+ desc.textContent=item.desc;
+ const skills=document.createElement("p");
+ skills.textContent="Skills to explore: "+item.skills.join(", ")+".";
+ const link=document.createElement("a");
+ link.className="btn";
+ link.href="https://www.linkedin.com/jobs/search/?keywords="+encodeURIComponent(item.search);
+ link.target="_blank";
+ link.rel="noopener noreferrer";
+ link.textContent="Explore related jobs ↗";
+ card.append(tag,title,desc,skills,link);
+ careers.appendChild(card);
+});
+
+const checklistItems=[
+"Prepare a clear, professional CV",
+"Create or update a professional email address",
+"List relevant academic projects and experience",
+"Identify skills required in my chosen career",
+"Complete a relevant course or practical project",
+"Prepare a professional introduction",
+"Check internship requirements and deadlines",
+"Review applications for accuracy before submitting"
+];
+
+const checklist=document.getElementById("checklist");
+const CHECK_KEY="campusgenius_career_checklist";
+const PLAN_KEY="campusgenius_career_plan";
+
+function renderChecklist(){
+ let saved={};
+ try{saved=JSON.parse(localStorage.getItem(CHECK_KEY)||"{}")}catch{}
+ checklist.replaceChildren();
+
+ checklistItems.forEach((text,index)=>{
+  const label=document.createElement("label");
+  label.style.display="flex";
+  label.style.alignItems="flex-start";
+  label.style.gap="10px";
+  label.style.fontWeight="normal";
+  const box=document.createElement("input");
+  box.type="checkbox";
+  box.checked=Boolean(saved[index]);
+  box.style.width="18px";
+  box.style.margin="0";
+  box.style.flexShrink="0";
+  box.dataset.index=index;
+  const span=document.createElement("span");
+  span.textContent=text;
+  label.append(box,span);
+  checklist.appendChild(label);
+ });
+}
+
+function getPlanText(){
+ const course=document.getElementById("course").value.trim()||"your current field";
+ const year=document.getElementById("year").value;
+ const interest=document.getElementById("interest").value;
+ const skills=document.getElementById("skills").value.trim();
+ const goal=document.getElementById("goal").value.trim();
+
+ const paths={
+  health:[
+   "Learn the principles of health records, medical terminology and data confidentiality.",
+   "Practise accurate data entry and spreadsheet reporting.",
+   "Explore health information, medical records and health data internship roles."
+  ],
+  technology:[
+   "Choose one digital skill to focus on first, such as Excel, web development or data analysis.",
+   "Complete small practical projects and keep examples of your work.",
+   "Explore beginner-friendly internships and entry-level opportunities."
+  ],
+  business:[
+   "Strengthen communication, organisation and spreadsheet skills.",
+   "Practise preparing reports, organising information and managing tasks.",
+   "Explore administrative, operations and business-support roles."
+  ],
+  education:[
+   "Strengthen research, writing and presentation skills.",
+   "Build a portfolio of class projects, presentations or research work.",
+   "Explore tutoring, research assistance and education-related opportunities."
+  ],
+  undecided:[
+   "List three subjects or activities you enjoy and why.",
+   "Explore two career paths and compare their daily tasks and entry requirements.",
+   "Speak with lecturers, career advisers or professionals before choosing a direction."
+  ]
+ };
+
+ return "YOUR CAREER STARTING PLAN\n\n"+
+ "Study field: "+course+"\n"+
+ "Current level: "+year+"\n"+
+ "Career interest: "+interest.replace("-"," ")+"\n\n"+
+ "SUGGESTED NEXT STEPS\n"+
+ paths[interest].map((x,i)=>(i+1)+". "+x).join("\n")+
+ "\n\nSKILLS TO BUILD\n"+
+ (skills||"List your current skills, then identify one or two gaps to work on.")+
+ "\n\nYOUR GOAL\n"+
+ (goal||"Set a specific goal and a target date.")+
+ "\n\nRECOMMENDED APPROACH\n"+
+ "Choose one achievable action this week. Track your progress and review your plan monthly. Verify qualifications and professional licensing requirements for any career you pursue.";
+}
+
+document.getElementById("generate").addEventListener("click",()=>{
+ const output=document.getElementById("plan");
+ output.textContent=getPlanText();
+ output.hidden=false;
+ document.getElementById("message").textContent="Your starting plan has been generated. Review it and adjust it to your circumstances.";
+});
+
+document.getElementById("savePlan").addEventListener("click",()=>{
+ const output=document.getElementById("plan");
+ if(output.hidden){
+  output.textContent=getPlanText();
+  output.hidden=false;
+ }
+ try{
+  localStorage.setItem(PLAN_KEY,output.textContent);
+  document.getElementById("message").textContent="Career plan saved in this browser.";
+ }catch{
+  document.getElementById("message").textContent="Could not save the plan. Check browser storage settings.";
+ }
+});
+
+document.getElementById("saveChecklist").addEventListener("click",()=>{
+ const data={};
+ checklist.querySelectorAll("input[type=checkbox]").forEach(box=>{
+  data[box.dataset.index]=box.checked;
+ });
+ try{
+  localStorage.setItem(CHECK_KEY,JSON.stringify(data));
+  document.getElementById("message").textContent="CV checklist saved.";
+ }catch{
+  document.getElementById("message").textContent="Could not save the checklist.";
+ }
+});
+
+document.getElementById("resetChecklist").addEventListener("click",()=>{
+ if(!confirm("Reset all checklist items?"))return;
+ localStorage.removeItem(CHECK_KEY);
+ renderChecklist();
+});
+
+renderChecklist();
+
+try{
+ const existing=localStorage.getItem(PLAN_KEY);
+ if(existing){
+  const output=document.getElementById("plan");
+  output.textContent=existing;
+  output.hidden=false;
+ }
+}catch{}
+</script>
+</body>
+</html>
