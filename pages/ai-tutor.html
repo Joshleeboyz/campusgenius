@@ -1,0 +1,134 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>AI Tutor | CampusGenius</title>
+<style>
+*{box-sizing:border-box}
+body{margin:0;font-family:Arial,sans-serif;background:#f3f7f4;color:#173628}
+header{background:#08783b;color:white;padding:18px 5%;display:flex;justify-content:space-between;align-items:center;gap:12px}
+header a{color:white;text-decoration:none;font-weight:bold}
+main{max-width:1000px;margin:30px auto;padding:0 16px}
+h1{margin-bottom:8px}
+.muted{color:#68796e;line-height:1.6}
+.layout{display:grid;grid-template-columns:270px 1fr;gap:18px}
+.panel{background:white;padding:20px;border:1px solid #e1eae3;border-radius:13px}
+label{display:block;font-size:13px;font-weight:bold;margin:15px 0 7px}
+select,textarea{width:100%;padding:12px;border:1px solid #d6e2d9;border-radius:8px;background:white;font:inherit}
+button{border:0;border-radius:8px;background:#08783b;color:white;padding:12px 16px;font-weight:bold;cursor:pointer}
+button:disabled{opacity:.6;cursor:not-allowed}
+.chat{min-height:340px;max-height:440px;overflow:auto;background:#f8fbf8;border-radius:9px;padding:15px;margin:15px 0}
+.bubble{padding:12px 14px;border-radius:10px;margin:10px 0;white-space:pre-wrap;overflow-wrap:anywhere;line-height:1.55}
+.bot{background:#e7f4eb;margin-right:12%}
+.user{background:#dce9ff;margin-left:12%}
+form textarea{min-height:90px;resize:vertical;margin-bottom:10px}
+.note{font-size:12px;color:#68796e;line-height:1.5}
+#status{font-size:13px;color:#08783b}
+@media(max-width:700px){.layout{grid-template-columns:1fr}header{padding:16px}main{margin-top:20px}}
+</style>
+</head>
+<body>
+<header>
+  <strong>CampusGenius AI Tutor</strong>
+  <a href="dashboard.html">← Dashboard</a>
+</header>
+<main>
+  <h1>Your personal learning assistant 🤖</h1>
+  <p class="muted">Choose your education level and subject. Ask questions, request explanations, or practise for examinations.</p>
+
+  <div class="layout">
+    <aside class="panel">
+      <h3>Learning settings</h3>
+      <label for="level">Education level</label>
+      <select id="level">
+        <option>Primary School</option>
+        <option>Junior Secondary (JSS)</option>
+        <option>Senior Secondary (SSS)</option>
+        <option>JAMB / UTME</option>
+        <option>Polytechnic / College</option>
+        <option>University Undergraduate</option>
+        <option>Postgraduate</option>
+        <option>Professional Learning</option>
+      </select>
+
+      <label for="subject">Subject or course</label>
+      <select id="subject">
+        <option>Mathematics</option>
+        <option>English Language</option>
+        <option>Biology</option>
+        <option>Chemistry</option>
+        <option>Physics</option>
+        <option>Economics</option>
+        <option>Government</option>
+        <option>Literature in English</option>
+        <option>Computer Science</option>
+        <option>Health Information Management</option>
+        <option>Public Health</option>
+        <option>Anatomy and Physiology</option>
+        <option>Statistics</option>
+        <option>Accounting</option>
+        <option>Other subject or course</option>
+      </select>
+
+      <label for="mode">Learning mode</label>
+      <select id="mode">
+        <option>Explain a topic</option>
+        <option>Solve a question step by step</option>
+        <option>Revision and summaries</option>
+        <option>Quiz me</option>
+        <option>Exam preparation</option>
+      </select>
+
+      <p class="note">Tip: Include the exact topic and explain what you find difficult.</p>
+    </aside>
+
+    <section class="panel">
+      <h3>Learning conversation</h3>
+      <div class="chat" id="chat" aria-live="polite">
+        <div class="bubble bot">Hello! Select your level, subject and learning mode, then enter a question. I'll help you understand the topic once the AI service is connected.</div>
+      </div>
+
+      <form id="questionForm">
+        <label for="question">Your question</label>
+        <textarea id="question" placeholder="e.g. Explain photosynthesis step by step..." required></textarea>
+        <button id="askButton" type="submit">Ask AI Tutor</button>
+        <p id="status" role="status"></p>
+      </form>
+      <p class="note">AI responses are not active yet. This page needs a secure backend connection to an AI provider before it can generate answers.</p>
+    </section>
+  </div>
+</main>
+
+<script>
+const token=sessionStorage.getItem("campusgenius_token");
+const student=sessionStorage.getItem("campusgenius_student");
+if(!token||!student){window.location.replace("login.html");}
+
+const chat=document.getElementById("chat");
+const form=document.getElementById("questionForm");
+const status=document.getElementById("status");
+
+form.addEventListener("submit",function(e){
+  e.preventDefault();
+  const question=document.getElementById("question").value.trim();
+  if(!question)return;
+
+  const userBubble=document.createElement("div");
+  userBubble.className="bubble user";
+  userBubble.textContent=question;
+  chat.appendChild(userBubble);
+
+  const answer=document.createElement("div");
+  answer.className="bubble bot";
+  answer.textContent="Your question is ready, but the AI service has not been connected yet. We will connect it through the backend so your private API key is not exposed in this page.";
+  chat.appendChild(answer);
+
+  status.textContent="AI integration required before answers can be generated.";
+  document.getElementById("question").value="";
+  chat.scrollTop=chat.scrollHeight;
+});
+</script>
+</body>
+</html>
