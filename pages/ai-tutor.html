@@ -2,133 +2,320 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
-<title>AI Tutor | CampusGenius</title>
-<style>
-*{box-sizing:border-box}
-body{margin:0;font-family:Arial,sans-serif;background:#f3f7f4;color:#173628}
-header{background:#08783b;color:white;padding:18px 5%;display:flex;justify-content:space-between;align-items:center;gap:12px}
-header a{color:white;text-decoration:none;font-weight:bold}
-main{max-width:1000px;margin:30px auto;padding:0 16px}
-h1{margin-bottom:8px}
-.muted{color:#68796e;line-height:1.6}
-.layout{display:grid;grid-template-columns:270px 1fr;gap:18px}
-.panel{background:white;padding:20px;border:1px solid #e1eae3;border-radius:13px}
-label{display:block;font-size:13px;font-weight:bold;margin:15px 0 7px}
-select,textarea{width:100%;padding:12px;border:1px solid #d6e2d9;border-radius:8px;background:white;font:inherit}
-button{border:0;border-radius:8px;background:#08783b;color:white;padding:12px 16px;font-weight:bold;cursor:pointer}
-button:disabled{opacity:.6;cursor:not-allowed}
-.chat{min-height:340px;max-height:440px;overflow:auto;background:#f8fbf8;border-radius:9px;padding:15px;margin:15px 0}
-.bubble{padding:12px 14px;border-radius:10px;margin:10px 0;white-space:pre-wrap;overflow-wrap:anywhere;line-height:1.55}
-.bot{background:#e7f4eb;margin-right:12%}
-.user{background:#dce9ff;margin-left:12%}
-form textarea{min-height:90px;resize:vertical;margin-bottom:10px}
-.note{font-size:12px;color:#68796e;line-height:1.5}
-#status{font-size:13px;color:#08783b}
-@media(max-width:700px){.layout{grid-template-columns:1fr}header{padding:16px}main{margin-top:20px}}
-</style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AI Tutor | CampusGenius</title>
+  <style>
+    :root {
+      --green: #08783b;
+      --light: #f3f8f4;
+      --border: #dce8df;
+      --text: #203127;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background: var(--light);
+      color: var(--text);
+    }
+
+    header {
+      background: var(--green);
+      color: white;
+      padding: 16px 6%;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+
+    header a { color: white; text-decoration: none; }
+
+    .brand { font-size: 21px; font-weight: bold; }
+
+    main {
+      max-width: 850px;
+      margin: 30px auto;
+      padding: 0 15px;
+    }
+
+    .intro { text-align: center; margin-bottom: 22px; }
+
+    .intro h1 { margin-bottom: 8px; }
+
+    .intro p { color: #5b6b60; line-height: 1.5; }
+
+    .chat {
+      background: white;
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      overflow: hidden;
+      box-shadow: 0 5px 20px #173d2510;
+    }
+
+    .chat-top {
+      padding: 15px 18px;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .status { color: var(--green); font-size: 13px; }
+
+    button, textarea { font: inherit; }
+
+    button {
+      cursor: pointer;
+      border: 0;
+      border-radius: 9px;
+      padding: 11px 15px;
+    }
+
+    .clear {
+      background: #edf3ee;
+      color: #294333;
+    }
+
+    #messages {
+      height: 420px;
+      overflow-y: auto;
+      padding: 18px;
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+    }
+
+    .message {
+      max-width: 88%;
+      padding: 13px 15px;
+      border-radius: 13px;
+      line-height: 1.6;
+      overflow-wrap: anywhere;
+      white-space: pre-wrap;
+    }
+
+    .assistant {
+      background: #eef5ef;
+      align-self: flex-start;
+    }
+
+    .user {
+      background: var(--green);
+      color: white;
+      align-self: flex-end;
+    }
+
+    .suggestions {
+      padding: 0 18px 15px;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    .suggestions button {
+      background: #f1f7f2;
+      border: 1px solid var(--border);
+      color: var(--green);
+      font-size: 13px;
+    }
+
+    .composer {
+      border-top: 1px solid var(--border);
+      padding: 14px;
+      display: flex;
+      gap: 10px;
+      align-items: flex-end;
+    }
+
+    textarea {
+      flex: 1;
+      min-width: 0;
+      min-height: 48px;
+      max-height: 140px;
+      resize: vertical;
+      padding: 13px;
+      border: 1px solid #cad8ce;
+      border-radius: 10px;
+      outline-color: var(--green);
+    }
+
+    .send {
+      background: var(--green);
+      color: white;
+      min-width: 80px;
+    }
+
+    .send:disabled { opacity: 0.6; cursor: wait; }
+
+    #notice {
+      padding: 0 16px 14px;
+      color: #a33c2f;
+      font-size: 13px;
+      line-height: 1.5;
+    }
+
+    .note {
+      color: #68786d;
+      text-align: center;
+      font-size: 12px;
+      line-height: 1.5;
+      margin: 15px 0;
+    }
+
+    @media (max-width: 500px) {
+      #messages { height: 55vh; }
+      .message { max-width: 95%; }
+      .send { min-width: 65px; }
+    }
+  </style>
 </head>
 <body>
-<header>
-  <strong>CampusGenius AI Tutor</strong>
-  <a href="dashboard.html">← Dashboard</a>
-</header>
-<main>
-  <h1>Your personal learning assistant 🤖</h1>
-  <p class="muted">Choose your education level and subject. Ask questions, request explanations, or practise for examinations.</p>
+  <header>
+    <a class="brand" href="../index.html">CampusGenius</a>
+    <a href="dashboard.html">← Back to Dashboard</a>
+  </header>
 
-  <div class="layout">
-    <aside class="panel">
-      <h3>Learning settings</h3>
-      <label for="level">Education level</label>
-      <select id="level">
-        <option>Primary School</option>
-        <option>Junior Secondary (JSS)</option>
-        <option>Senior Secondary (SSS)</option>
-        <option>JAMB / UTME</option>
-        <option>Polytechnic / College</option>
-        <option>University Undergraduate</option>
-        <option>Postgraduate</option>
-        <option>Professional Learning</option>
-      </select>
+  <main>
+    <section class="intro">
+      <h1>🎓 Your AI Tutor</h1>
+      <p>Ask questions, understand difficult topics, and get step-by-step explanations.</p>
+    </section>
 
-      <label for="subject">Subject or course</label>
-      <select id="subject">
-        <option>Mathematics</option>
-        <option>English Language</option>
-        <option>Biology</option>
-        <option>Chemistry</option>
-        <option>Physics</option>
-        <option>Economics</option>
-        <option>Government</option>
-        <option>Literature in English</option>
-        <option>Computer Science</option>
-        <option>Health Information Management</option>
-        <option>Public Health</option>
-        <option>Anatomy and Physiology</option>
-        <option>Statistics</option>
-        <option>Accounting</option>
-        <option>Other subject or course</option>
-      </select>
-
-      <label for="mode">Learning mode</label>
-      <select id="mode">
-        <option>Explain a topic</option>
-        <option>Solve a question step by step</option>
-        <option>Revision and summaries</option>
-        <option>Quiz me</option>
-        <option>Exam preparation</option>
-      </select>
-
-      <p class="note">Tip: Include the exact topic and explain what you find difficult.</p>
-    </aside>
-
-    <section class="panel">
-      <h3>Learning conversation</h3>
-      <div class="chat" id="chat" aria-live="polite">
-        <div class="bubble bot">Hello! Select your level, subject and learning mode, then enter a question. I'll help you understand the topic once the AI service is connected.</div>
+    <section class="chat">
+      <div class="chat-top">
+        <div>
+          <strong>CampusGenius Study Assistant</strong><br>
+          <span class="status">● Ready to help you learn</span>
+        </div>
+        <button class="clear" id="clearBtn" type="button">Clear chat</button>
       </div>
 
-      <form id="questionForm">
-        <label for="question">Your question</label>
-        <textarea id="question" placeholder="e.g. Explain photosynthesis step by step..." required></textarea>
-        <button id="askButton" type="submit">Ask AI Tutor</button>
-        <p id="status" role="status"></p>
+      <div id="messages" aria-live="polite">
+        <div class="message assistant">Hello! 👋 Welcome to your AI Tutor.
+
+What subject or topic would you like help with today?
+
+You can ask me to explain a concept, solve a practice question, or help you prepare for an examination.</div>
+      </div>
+
+      <div class="suggestions">
+        <button type="button" data-question="Explain photosynthesis step by step.">Explain a topic</button>
+        <button type="button" data-question="Give me five practice questions on biology with answers and explanations.">Practice questions</button>
+        <button type="button" data-question="Teach me how to calculate percentages, with examples.">Solve a problem</button>
+      </div>
+
+      <form class="composer" id="chatForm">
+        <textarea id="question" maxlength="4000"
+          placeholder="Type your question here..." required
+          aria-label="Your question"></textarea>
+        <button class="send" id="sendBtn" type="submit">Send</button>
       </form>
-      <p class="note">AI responses are not active yet. This page needs a secure backend connection to an AI provider before it can generate answers.</p>
+      <div id="notice" role="status"></div>
     </section>
-  </div>
-</main>
 
-<script>
-const token=sessionStorage.getItem("campusgenius_token");
-const student=sessionStorage.getItem("campusgenius_student");
-if(!token||!student){window.location.replace("login.html");}
+    <p class="note">
+      AI answers can contain mistakes. Check important academic information
+      against your lecturer's notes and trusted learning materials.
+    </p>
+  </main>
 
-const chat=document.getElementById("chat");
-const form=document.getElementById("questionForm");
-const status=document.getElementById("status");
+  <script>
+    const API_URL = "https://campusgenius.onrender.com";
+    const messages = document.getElementById("messages");
+    const form = document.getElementById("chatForm");
+    const input = document.getElementById("question");
+    const sendBtn = document.getElementById("sendBtn");
+    const notice = document.getElementById("notice");
+    const clearBtn = document.getElementById("clearBtn");
 
-form.addEventListener("submit",function(e){
-  e.preventDefault();
-  const question=document.getElementById("question").value.trim();
-  if(!question)return;
+    function addMessage(text, type) {
+      const bubble = document.createElement("div");
+      bubble.className = "message " + type;
+      bubble.textContent = text;
+      messages.appendChild(bubble);
+      messages.scrollTop = messages.scrollHeight;
+      return bubble;
+    }
 
-  const userBubble=document.createElement("div");
-  userBubble.className="bubble user";
-  userBubble.textContent=question;
-  chat.appendChild(userBubble);
+    function showWelcome() {
+      addMessage(
+        "Hello! 👋 Welcome to your AI Tutor.\n\nWhat subject or topic would you like help with today?\n\nYou can ask me to explain a concept, solve a practice question, or help you prepare for an examination.",
+        "assistant"
+      );
+    }
 
-  const answer=document.createElement("div");
-  answer.className="bubble bot";
-  answer.textContent="Your question is ready, but the AI service has not been connected yet. We will connect it through the backend so your private API key is not exposed in this page.";
-  chat.appendChild(answer);
+    clearBtn.addEventListener("click", () => {
+      messages.replaceChildren();
+      notice.textContent = "";
+      showWelcome();
+    });
 
-  status.textContent="AI integration required before answers can be generated.";
-  document.getElementById("question").value="";
-  chat.scrollTop=chat.scrollHeight;
-});
-</script>
+    document.querySelectorAll("[data-question]").forEach(button => {
+      button.addEventListener("click", () => {
+        input.value = button.dataset.question;
+        input.focus();
+      });
+    });
+
+    form.addEventListener("submit", async event => {
+      event.preventDefault();
+
+      const question = input.value.trim();
+      if (!question || sendBtn.disabled) return;
+
+      const token = sessionStorage.getItem("campusgenius_token");
+
+      if (!token) {
+        notice.textContent = "Please log in first to use the AI Tutor.";
+        return;
+      }
+
+      addMessage(question, "user");
+      input.value = "";
+      notice.textContent = "";
+      sendBtn.disabled = true;
+      sendBtn.textContent = "Thinking...";
+
+      const waiting = addMessage("Preparing your answer. Please wait...", "assistant");
+
+      try {
+        const response = await fetch(API_URL + "/api/ai-tutor", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            "Authorization": "Bearer " + token
+          },
+          body: JSON.stringify({ question })
+        });
+
+        const data = await response.json().catch(() => ({}));
+
+        if (!response.ok) {
+          if (response.status === 401 || response.status === 403) {
+            throw new Error("Your login may have expired. Please log in again.");
+          }
+          if (response.status === 429) {
+            throw new Error("Too many requests. Please wait a little and try again.");
+          }
+          throw new Error(data.error || data.message || "The AI Tutor could not answer. Please try again.");
+        }
+
+        waiting.textContent = data.answer || "No answer was returned. Please try again.";
+      } catch (error) {
+        waiting.textContent = "I couldn't get an answer this time.";
+        notice.textContent = error.message || "Check your internet connection and try again.";
+      } finally {
+        sendBtn.disabled = false;
+        sendBtn.textContent = "Send";
+        input.focus();
+      }
+    });
+  </script>
 </body>
 </html>
