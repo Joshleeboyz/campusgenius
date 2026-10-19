@@ -1,0 +1,266 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Learning Materials | CampusGenius</title>
+<style>
+*{box-sizing:border-box}
+body{margin:0;font-family:Arial,sans-serif;background:#f3f7f4;color:#183729}
+header{background:#08783b;color:white;padding:18px 5%;display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap}
+header a{color:white;text-decoration:none;font-weight:bold}
+main{max-width:1100px;margin:30px auto;padding:0 16px}
+h1{margin-bottom:8px}
+.muted{color:#65766a;line-height:1.6}
+.panel,.material{background:white;border:1px solid #e0e9e2;border-radius:13px;padding:20px}
+.panel{margin:20px 0}
+.filters{display:grid;grid-template-columns:2fr 1fr 1fr;gap:12px}
+label{display:block;font-size:14px;font-weight:bold;margin:12px 0 7px}
+input,select,textarea{width:100%;padding:11px;border:1px solid #d4e0d7;border-radius:8px;font:inherit;background:white}
+button,.btn{display:inline-block;background:#08783b;color:white;border:0;border-radius:8px;padding:11px 14px;font-weight:bold;text-decoration:none;cursor:pointer;font-size:14px}
+button.secondary{background:#64766a}
+button.delete{background:#a52d2d}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(245px,1fr));gap:15px;margin:18px 0}
+.material{display:flex;flex-direction:column;gap:10px;min-width:0}
+.material h3{margin:0;color:#08783b;overflow-wrap:anywhere}
+.tag{display:inline-block;width:max-content;max-width:100%;background:#e8f4ec;color:#08783b;padding:5px 9px;border-radius:20px;font-size:12px;font-weight:bold}
+.material .btn{margin-top:auto;text-align:center}
+.actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}
+.empty{background:white;border-radius:12px;padding:24px;text-align:center;color:#65766a}
+.note{font-size:12px;line-height:1.6;color:#65766a}
+@media(max-width:650px){.filters{grid-template-columns:1fr}.panel,.material{padding:15px}main{margin-top:20px}}
+</style>
+</head>
+<body>
+<header>
+<strong>CampusGenius | Learning Materials</strong>
+<a href="dashboard.html">← Dashboard</a>
+</header>
+
+<main>
+<h1>Learning Materials 📚</h1>
+<p class="muted">Organise course notes, revision documents and useful study resources in one place.</p>
+
+<section class="panel">
+<h2>Find materials</h2>
+<div class="filters">
+<div>
+<label for="search">Search materials</label>
+<input id="search" placeholder="Search title, course or topic">
+</div>
+<div>
+<label for="level">Study level</label>
+<select id="level">
+<option value="all">All levels</option>
+<option value="100L">100 Level</option>
+<option value="200L">200 Level</option>
+<option value="300L">300 Level</option>
+<option value="400L">400 Level</option>
+<option value="500L">500 Level</option>
+<option value="other">Other</option>
+</select>
+</div>
+<div>
+<label for="category">Category</label>
+<select id="category">
+<option value="all">All categories</option>
+<option value="lecture-notes">Lecture notes</option>
+<option value="revision">Revision notes</option>
+<option value="past-questions">Past questions</option>
+<option value="textbooks">Textbooks</option>
+<option value="other">Other</option>
+</select>
+</div>
+</div>
+<p class="note">The library starts empty. Add materials you own or are authorised to share. Only add links to files you trust and have permission to distribute.</p>
+</section>
+
+<section class="panel">
+<h2>Add a learning resource</h2>
+<label for="title">Resource title *</label>
+<input id="title" placeholder="e.g. Introduction to Health Information Management">
+
+<label for="course">Course code or subject *</label>
+<input id="course" placeholder="e.g. HIM 101">
+
+<label for="studyLevel">Study level</label>
+<select id="studyLevel">
+<option value="100L">100 Level</option>
+<option value="200L">200 Level</option>
+<option value="300L">300 Level</option>
+<option value="400L">400 Level</option>
+<option value="500L">500 Level</option>
+<option value="other">Other</option>
+</select>
+
+<label for="resourceCategory">Resource category</label>
+<select id="resourceCategory">
+<option value="lecture-notes">Lecture notes</option>
+<option value="revision">Revision notes</option>
+<option value="past-questions">Past questions</option>
+<option value="textbooks">Textbooks</option>
+<option value="other">Other</option>
+</select>
+
+<label for="description">Description</label>
+<textarea id="description" rows="3" placeholder="What will students learn from this resource?"></textarea>
+
+<label for="url">Resource link *</label>
+<input id="url" type="url" placeholder="https://...">
+
+<div class="actions">
+<button id="add">Add resource</button>
+<button id="clear" class="secondary" type="button">Clear form</button>
+</div>
+<p id="message" class="muted" aria-live="polite"></p>
+</section>
+
+<h2>Resource library</h2>
+<div id="materials" class="grid"></div>
+<p class="note">Resources are saved in this browser on this device. They are not yet shared with other CampusGenius users or synced to your account.</p>
+</main>
+
+<script>
+const KEY="campusgenius_learning_materials";
+const search=document.getElementById("search");
+const level=document.getElementById("level");
+const category=document.getElementById("category");
+const container=document.getElementById("materials");
+const message=document.getElementById("message");
+
+const categoryNames={
+ "lecture-notes":"Lecture notes",
+ "revision":"Revision notes",
+ "past-questions":"Past questions",
+ "textbooks":"Textbooks",
+ "other":"Other"
+};
+
+function getMaterials(){
+ try{
+  const data=JSON.parse(localStorage.getItem(KEY)||"[]");
+  return Array.isArray(data)?data:[];
+ }catch{return []}
+}
+
+function validWebUrl(value){
+ try{
+  const u=new URL(value);
+  return u.protocol==="https:"||u.protocol==="http:";
+ }catch{return false}
+}
+
+function render(){
+ const q=search.value.trim().toLowerCase();
+ const selectedLevel=level.value;
+ const selectedCategory=category.value;
+
+ const items=getMaterials().filter(item=>{
+  const text=[item.title,item.course,item.description,item.studyLevel,
+   categoryNames[item.category]||item.category].join(" ").toLowerCase();
+  return text.includes(q)
+   &&(selectedLevel==="all"||item.studyLevel===selectedLevel)
+   &&(selectedCategory==="all"||item.category===selectedCategory);
+ });
+
+ container.replaceChildren();
+
+ if(!items.length){
+  container.innerHTML='<div class="empty">No matching materials yet. Add your first resource using the form above.</div>';
+  return;
+ }
+
+ items.forEach(item=>{
+  const card=document.createElement("article");
+  card.className="material";
+
+  const tag=document.createElement("span");
+  tag.className="tag";
+  tag.textContent=(item.studyLevel||"Level not specified")+" · "+
+   (categoryNames[item.category]||"Other");
+
+  const title=document.createElement("h3");
+  title.textContent=item.title;
+
+  const course=document.createElement("strong");
+  course.textContent=item.course;
+
+  const description=document.createElement("p");
+  description.className="muted";
+  description.textContent=item.description||"No description provided.";
+
+  card.append(tag,title,course,description);
+
+  if(validWebUrl(item.url)){
+   const link=document.createElement("a");
+   link.className="btn";
+   link.href=item.url;
+   link.target="_blank";
+   link.rel="noopener noreferrer";
+   link.textContent="Open resource ↗";
+   card.appendChild(link);
+  }
+
+  const remove=document.createElement("button");
+  remove.className="delete";
+  remove.textContent="Remove resource";
+  remove.addEventListener("click",()=>{
+   if(!confirm("Remove this resource from this browser?"))return;
+   localStorage.setItem(KEY,JSON.stringify(getMaterials().filter(x=>x.id!==item.id)));
+   render();
+  });
+  card.appendChild(remove);
+  container.appendChild(card);
+ });
+}
+
+document.getElementById("add").addEventListener("click",()=>{
+ const title=document.getElementById("title").value.trim();
+ const course=document.getElementById("course").value.trim();
+ const studyLevel=document.getElementById("studyLevel").value;
+ const resourceCategory=document.getElementById("resourceCategory").value;
+ const description=document.getElementById("description").value.trim();
+ const url=document.getElementById("url").value.trim();
+
+ if(!title||!course||!url){
+  message.textContent="Please enter the resource title, course and link.";
+  return;
+ }
+ if(!validWebUrl(url)){
+  message.textContent="Enter a valid link beginning with https:// or http://.";
+  return;
+ }
+
+ const items=getMaterials();
+ items.unshift({
+  id:Date.now().toString(),
+  title,course,studyLevel,
+  category:resourceCategory,
+  description,url
+ });
+
+ try{
+  localStorage.setItem(KEY,JSON.stringify(items));
+  message.textContent="Resource added successfully on this device.";
+  ["title","course","description","url"].forEach(id=>{
+   document.getElementById(id).value="";
+  });
+  render();
+ }catch{
+  message.textContent="Unable to save. Check your browser storage settings.";
+ }
+});
+
+document.getElementById("clear").addEventListener("click",()=>{
+ ["title","course","description","url"].forEach(id=>{
+  document.getElementById(id).value="";
+ });
+ message.textContent="";
+});
+
+[search,level,category].forEach(el=>el.addEventListener("input",render));
+render();
+</script>
+</body>
+</html>
