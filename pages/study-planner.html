@@ -1,0 +1,260 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Study Planner | CampusGenius</title>
+<style>
+*{box-sizing:border-box}
+body{margin:0;font-family:Arial,sans-serif;background:#f3f7f4;color:#173628}
+header{background:#08783b;color:white;padding:18px 5%;display:flex;justify-content:space-between;align-items:center;gap:12px}
+header a{color:white;text-decoration:none;font-weight:bold}
+main{max-width:1050px;margin:30px auto;padding:0 16px}
+.muted{color:#68796e;line-height:1.6}
+.layout{display:grid;grid-template-columns:340px 1fr;gap:18px;align-items:start}
+.panel{background:white;padding:20px;border:1px solid #e1eae3;border-radius:13px;margin-bottom:18px}
+label{display:block;font-size:13px;font-weight:bold;margin:14px 0 7px}
+input,select,textarea{width:100%;padding:11px;border:1px solid #d6e2d9;border-radius:8px;font:inherit;background:white}
+button{background:#08783b;color:white;border:0;padding:12px 16px;border-radius:8px;font-weight:bold;cursor:pointer}
+button.secondary{background:#e8f4ec;color:#08783b}
+form button{width:100%;margin-top:16px}
+.item{border:1px solid #e2eae4;border-radius:9px;padding:14px;margin:10px 0}
+.item strong{display:block;margin-bottom:6px}
+.item p{font-size:13px;color:#68796e;line-height:1.5;margin:5px 0}
+.item button{padding:8px 10px;font-size:12px;margin:5px 5px 0 0}
+.badge{display:inline-block;background:#e8f4ec;color:#08783b;border-radius:5px;padding:4px 7px;font-size:11px}
+#message{font-size:13px;color:#08783b;line-height:1.5}
+.empty{padding:20px;background:#f8fbf8;border-radius:9px;color:#68796e;font-size:14px;line-height:1.6}
+@media(max-width:750px){.layout{grid-template-columns:1fr}header{padding:16px}}
+</style>
+</head>
+<body>
+<header>
+<strong>CampusGenius Study Planner</strong>
+<a href="dashboard.html">← Dashboard</a>
+</header>
+
+<main>
+<h1>My Study Planner 🗓️</h1>
+<p class="muted">Organise your classes, revision sessions, assignments and examination preparation in one place.</p>
+
+<div class="layout">
+<section class="panel">
+<h2>Add a study session</h2>
+<form id="studyForm">
+<label for="title">Subject or activity</label>
+<input id="title" required placeholder="e.g. Anatomy revision">
+
+<label for="category">Activity type</label>
+<select id="category">
+<option>Personal Study</option>
+<option>Lecture</option>
+<option>Assignment</option>
+<option>Revision</option>
+<option>CBT Practice</option>
+<option>Group Study</option>
+<option>Break</option>
+</select>
+
+<label for="date">Date</label>
+<input id="date" type="date" required>
+
+<label for="start">Start time</label>
+<input id="start" type="time" required>
+
+<label for="end">End time</label>
+<input id="end" type="time" required>
+
+<label for="notes">Notes (optional)</label>
+<textarea id="notes" rows="3" placeholder="Topics to cover or tasks to complete"></textarea>
+
+<button type="submit">Save Study Session</button>
+<p id="message" role="status"></p>
+</form>
+</section>
+
+<section>
+<div class="panel">
+<h2>My schedule</h2>
+<p class="muted">Your sessions are stored in this browser on this device.</p>
+<label for="filter">Show sessions</label>
+<select id="filter">
+<option value="upcoming">Today and future</option>
+<option value="all">All sessions</option>
+<option value="past">Past sessions</option>
+</select>
+<div id="sessionList"></div>
+</div>
+
+<div class="panel">
+<h2>Study planning tips</h2>
+<div class="item">
+<strong>📘 Break big topics into smaller tasks</strong>
+<p>Schedule individual topics instead of trying to study an entire course at once.</p>
+</div>
+<div class="item">
+<strong>⏱️ Use focused study blocks</strong>
+<p>Try 25–50 minutes of focused work followed by a short break.</p>
+</div>
+<div class="item">
+<strong>🔁 Revise regularly</strong>
+<p>Revisit difficult topics over several days and test yourself without looking at your notes.</p>
+</div>
+<div class="item">
+<strong>🌙 Protect your rest</strong>
+<p>Allow time for sleep, meals, lectures and other responsibilities.</p>
+</div>
+</div>
+</section>
+</div>
+</main>
+
+<script>
+const STORAGE_KEY="campusgenius_planner_sessions";
+const form=document.getElementById("studyForm");
+const list=document.getElementById("sessionList");
+const message=document.getElementById("message");
+
+if(!sessionStorage.getItem("campusgenius_token")||
+   !sessionStorage.getItem("campusgenius_student")){
+  window.location.replace("login.html");
+}
+
+function getSessions(){
+  try{
+    const value=JSON.parse(localStorage.getItem(STORAGE_KEY)||"[]");
+    return Array.isArray(value)?value:[];
+  }catch(e){return [];}
+}
+
+function saveSessions(sessions){
+  localStorage.setItem(STORAGE_KEY,JSON.stringify(sessions));
+}
+
+function render(){
+  const sessions=getSessions().sort((a,b)=>
+    (a.date+"T"+a.start).localeCompare(b.date+"T"+b.start)
+  );
+  const filter=document.getElementById("filter").value;
+  const today=new Date().toLocaleDateString("en-CA");
+  const visible=sessions.filter(s=>{
+    const sessionDate=s.date;
+    if(filter==="upcoming")return sessionDate>=today;
+    if(filter==="past")return sessionDate<today;
+    return true;
+  });
+
+  list.replaceChildren();
+
+  if(!visible.length){
+    const empty=document.createElement("div");
+    empty.className="empty";
+    empty.textContent="No sessions to display. Add your first study session using the form.";
+    list.appendChild(empty);
+    return;
+  }
+
+  visible.forEach(session=>{
+    const card=document.createElement("article");
+    card.className="item";
+
+    const title=document.createElement("strong");
+    title.textContent=session.title;
+
+    const badge=document.createElement("span");
+    badge.className="badge";
+    badge.textContent=session.category;
+
+    const details=document.createElement("p");
+    details.textContent=session.date+" · "+session.start+"–"+session.end;
+
+    card.append(title,badge,details);
+
+    if(session.notes){
+      const notes=document.createElement("p");
+      notes.textContent=session.notes;
+      card.appendChild(notes);
+    }
+
+    const complete=document.createElement("button");
+    complete.className="secondary";
+    complete.textContent=session.completed?"Mark incomplete":"Mark complete";
+    complete.addEventListener("click",()=>{
+      const all=getSessions();
+      const target=all.find(s=>s.id===session.id);
+      if(target)target.completed=!target.completed;
+      saveSessions(all);
+      render();
+    });
+
+    const remove=document.createElement("button");
+    remove.textContent="Delete";
+    remove.style.background="#a62d2d";
+    remove.addEventListener("click",()=>{
+      if(confirm("Delete this study session?")){
+        saveSessions(getSessions().filter(s=>s.id!==session.id));
+        render();
+      }
+    });
+
+    if(session.completed){
+      title.textContent="✓ "+session.title;
+      title.style.color="#08783b";
+    }
+
+    card.append(complete,remove);
+    list.appendChild(card);
+  });
+}
+
+form.addEventListener("submit",function(e){
+  e.preventDefault();
+
+  const title=document.getElementById("title").value.trim();
+  const category=document.getElementById("category").value;
+  const date=document.getElementById("date").value;
+  const start=document.getElementById("start").value;
+  const end=document.getElementById("end").value;
+  const notes=document.getElementById("notes").value.trim();
+
+  if(!title||!date||!start||!end){
+    message.textContent="Please complete all required fields.";
+    return;
+  }
+
+  if(end<=start){
+    message.textContent="End time must be later than start time.";
+    return;
+  }
+
+  const sessions=getSessions();
+  const conflict=sessions.some(s=>
+    s.date===date&&start<s.end&&end>s.start
+  );
+
+  if(conflict&&!confirm("This overlaps with another session. Save anyway?")){
+    return;
+  }
+
+  sessions.push({
+    id:Date.now().toString()+"-"+Math.random().toString(36).slice(2,8),
+    title,category,date,start,end,notes,completed:false
+  });
+
+  try{
+    saveSessions(sessions);
+    form.reset();
+    message.textContent="Study session saved successfully.";
+    render();
+  }catch(error){
+    message.textContent="Could not save. Check your browser storage.";
+  }
+});
+
+document.getElementById("filter").addEventListener("change",render);
+document.getElementById("date").value=new Date().toLocaleDateString("en-CA");
+render();
+</script>
+</body>
+</html>
