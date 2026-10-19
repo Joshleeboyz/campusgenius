@@ -12,6 +12,7 @@ const fs = require("fs");
 const path = require("path");
 
 const app = express();
+app.set("trust proxy", 1);
 const PORT = process.env.PORT || 5000;
 
 if (!process.env.DATABASE_URL || !process.env.JWT_SECRET) {
