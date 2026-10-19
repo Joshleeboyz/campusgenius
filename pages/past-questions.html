@@ -1,0 +1,156 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Past Questions Library | CampusGenius</title>
+<style>
+*{box-sizing:border-box}
+body{margin:0;font-family:Arial,sans-serif;background:#f3f7f4;color:#173628}
+header{background:#08783b;color:white;padding:18px 5%;display:flex;justify-content:space-between;align-items:center;gap:12px}
+header a{color:white;text-decoration:none;font-weight:bold}
+main{max-width:1050px;margin:30px auto;padding:0 16px}
+.muted{color:#68796e;line-height:1.6}
+.panel{background:white;border:1px solid #e1eae3;border-radius:13px;padding:21px;margin:18px 0}
+.filters{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}
+label{display:block;font-size:13px;font-weight:bold;margin-bottom:7px}
+select,input{width:100%;padding:12px;border:1px solid #d6e2d9;border-radius:8px;background:white;font:inherit}
+button{background:#08783b;color:white;border:0;padding:12px 16px;border-radius:8px;cursor:pointer;font-weight:bold}
+.grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:15px}
+.card{background:white;border:1px solid #e1eae3;border-radius:12px;padding:18px}
+.card h3{margin:8px 0}
+.tag{display:inline-block;background:#e8f4ec;color:#08783b;padding:5px 8px;border-radius:6px;font-size:12px;font-weight:bold}
+.card p{font-size:13px;line-height:1.5;color:#68796e}
+.card button{width:100%}
+#resultsMessage{color:#08783b;font-size:14px}
+.note{background:#fff7e6;color:#72551f;padding:14px;border-radius:9px;font-size:13px;line-height:1.6;margin-top:20px}
+@media(max-width:750px){.grid{grid-template-columns:repeat(2,minmax(0,1fr))}.filters{grid-template-columns:1fr}}
+@media(max-width:480px){.grid{grid-template-columns:1fr}header{padding:16px}}
+</style>
+</head>
+<body>
+<header>
+  <strong>CampusGenius Past Questions</strong>
+  <a href="dashboard.html">← Dashboard</a>
+</header>
+<main>
+  <h1>Past Questions Library 📚</h1>
+  <p class="muted">Find examination practice resources by examination type, subject, year and institution.</p>
+
+  <section class="panel">
+    <div class="filters">
+      <div>
+        <label for="exam">Examination</label>
+        <select id="exam">
+          <option value="all">All examinations</option>
+          <option>JAMB / UTME</option>
+          <option>WAEC</option>
+          <option>NECO</option>
+          <option>University</option>
+          <option>Polytechnic</option>
+        </select>
+      </div>
+      <div>
+        <label for="subject">Subject / Course</label>
+        <select id="subject">
+          <option value="all">All subjects</option>
+          <option>English Language</option>
+          <option>Mathematics</option>
+          <option>Biology</option>
+          <option>Chemistry</option>
+          <option>Physics</option>
+          <option>Economics</option>
+          <option>Government</option>
+          <option>Health Information Management</option>
+          <option>Other</option>
+        </select>
+      </div>
+      <div>
+        <label for="year">Year</label>
+        <select id="year">
+          <option value="all">All years</option>
+        </select>
+      </div>
+    </div>
+    <p style="margin-bottom:0"><button id="filterButton" style="margin-top:15px">Find Resources</button></p>
+  </section>
+
+  <div style="display:flex;justify-content:space-between;gap:12px;align-items:center;flex-wrap:wrap">
+    <h2>Available resources</h2>
+    <span id="resultsMessage"></span>
+  </div>
+
+  <section class="grid" id="resourceGrid"></section>
+
+  <div class="note">
+    <strong>Archive status:</strong> This page is a searchable resource catalogue, not a complete 20-year archive. Actual question papers and answer keys must be added from verified, legally permitted sources. No official paper is available for download from this page yet.
+  </div>
+</main>
+
+<script>
+const yearSelect=document.getElementById("year");
+for(let y=new Date().getFullYear();y>=new Date().getFullYear()-20;y--){
+  const option=document.createElement("option");
+  option.value=String(y);
+  option.textContent=String(y);
+  yearSelect.appendChild(option);
+}
+
+/* Add verified resources here when their permitted URLs are available. */
+const resources=[];
+
+const grid=document.getElementById("resourceGrid");
+const message=document.getElementById("resultsMessage");
+
+function renderResources(){
+  const exam=document.getElementById("exam").value;
+  const subject=document.getElementById("subject").value;
+  const year=document.getElementById("year").value;
+
+  const matches=resources.filter(item=>
+    (exam==="all"||item.exam===exam)&&
+    (subject==="all"||item.subject===subject)&&
+    (year==="all"||String(item.year)===year)
+  );
+
+  grid.replaceChildren();
+
+  if(matches.length===0){
+    const card=document.createElement("article");
+    card.className="card";
+    const heading=document.createElement("h3");
+    heading.textContent="No verified resources added yet";
+    const text=document.createElement("p");
+    text.textContent="Your selected filters are ready. Verified question papers and answer keys will appear here when their source links are added.";
+    card.append(heading,text);
+    grid.appendChild(card);
+  }else{
+    matches.forEach(item=>{
+      const card=document.createElement("article");
+      card.className="card";
+      const tag=document.createElement("span");
+      tag.className="tag";
+      tag.textContent=item.exam;
+      const heading=document.createElement("h3");
+      heading.textContent=item.subject+" — "+item.year;
+      const description=document.createElement("p");
+      description.textContent=item.description||"Verified study resource.";
+      const link=document.createElement("a");
+      link.href=item.url;
+      link.target="_blank";
+      link.rel="noopener noreferrer";
+      const button=document.createElement("button");
+      button.textContent="Open Resource";
+      link.appendChild(button);
+      card.append(tag,heading,description,link);
+      grid.appendChild(card);
+    });
+  }
+  message.textContent=matches.length+" verified resource(s) found";
+}
+document.getElementById("filterButton").addEventListener("click",renderResources);
+renderResources();
+</script>
+</body>
+</html>
