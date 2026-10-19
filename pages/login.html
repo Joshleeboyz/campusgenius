@@ -7,32 +7,28 @@
   <title>Login | CampusGenius</title>
   <link rel="stylesheet" href="../css/style.css">
   <style>
-    .auth-container {
-      max-width: 460px;
-      margin: 50px auto;
-      padding: 28px;
+    body {
+      background: #f5f8f6;
+      font-family: Arial, sans-serif;
+    }
+    .login-box {
+      max-width: 420px;
+      margin: 60px auto;
+      padding: 30px;
       background: white;
       border-radius: 12px;
-      box-shadow: 0 4px 20px #00000012;
+      box-shadow: 0 3px 15px #00000012;
     }
-    .auth-container h1 { color: #0a7f3f; }
-    .auth-container label {
-      display: block;
-      margin-top: 16px;
-      font-weight: 600;
-    }
-    .auth-container input {
-      box-sizing: border-box;
+    h1 { color: #0a7f3f; }
+    input {
       width: 100%;
       padding: 12px;
-      margin-top: 6px;
-      border: 1px solid #ccc;
-      border-radius: 6px;
+      margin: 8px 0 16px;
+      box-sizing: border-box;
     }
-    .auth-container button {
+    button {
       width: 100%;
-      padding: 13px;
-      margin-top: 22px;
+      padding: 12px;
       background: #0a7f3f;
       color: white;
       border: 0;
@@ -43,77 +39,68 @@
   </style>
 </head>
 <body>
-  <main class="auth-container">
-    <h1>Welcome back</h1>
+  <main class="login-box">
+    <h1>Welcome Back!</h1>
     <p>Log in to your CampusGenius account.</p>
 
     <form id="loginForm">
-      <label for="email">Email address</label>
-      <input id="email" name="email" type="email"
-        required autocomplete="email">
+      <label for="email">Email Address</label>
+      <input type="email" id="email" required>
 
       <label for="password">Password</label>
-      <input id="password" name="password" type="password"
-        required autocomplete="current-password">
+      <input type="password" id="password" required>
 
-      <button id="loginButton" type="submit">Log In</button>
-      <p id="message" role="status" aria-live="polite"></p>
+      <button type="submit" id="loginButton">Log In</button>
     </form>
 
-    <p>Don't have an account?
-      <a href="register.html">Create one</a>
-    </p>
+    <p id="message" role="status"></p>
+    <p>Don't have an account? <a href="register.html">Register here</a></p>
     <p><a href="../index.html">Back to Home</a></p>
   </main>
 
   <script>
     const API_URL = "https://campusgenius.onrender.com";
-
     const form = document.getElementById("loginForm");
     const message = document.getElementById("message");
     const button = document.getElementById("loginButton");
 
-    form.addEventListener("submit", async function (event) {
+    form.addEventListener("submit", async function(event) {
       event.preventDefault();
-      message.textContent = "";
-
-      const email = document.getElementById("email").value.trim();
-      const password = document.getElementById("password").value;
-
+      message.textContent = "Logging in...";
       button.disabled = true;
-      button.textContent = "Logging in...";
 
       try {
         const response = await fetch(API_URL + "/api/auth/login", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ email, password })
+          body: JSON.stringify({
+            email: document.getElementById("email").value.trim(),
+            password: document.getElementById("password").value
+          })
         });
 
         const data = await response.json();
 
         if (!response.ok) {
-          throw new Error(data.message || "Login failed.");
+          throw new Error(data.message || data.error || "Login failed. Check your details.");
         }
 
-        // Keep the token in this tab's session only.
+        if (!data.token || !data.student) {
+          throw new Error("Login response was incomplete. Please try again.");
+        }
+
         sessionStorage.setItem("campusgenius_token", data.token);
         sessionStorage.setItem(
           "campusgenius_student",
           JSON.stringify(data.student)
         );
 
-        message.textContent =
-          "Login successful! Welcome, " + data.student.full_name + ".";
-        form.reset();
+        window.location.href = "dashboard.html";
+
       } catch (error) {
-        message.textContent =
-          error.message === "Failed to fetch"
-            ? "Could not reach the server. Please try again."
-            : error.message;
-      } finally {
+        message.textContent = error.message ||
+          "Unable to connect. Please try again.";
         button.disabled = false;
-        button.textContent = "Log In";
       }
     });
   </script>
