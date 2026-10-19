@@ -1,0 +1,181 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>JAMB CBT Practice | CampusGenius</title>
+<style>
+*{box-sizing:border-box}
+body{margin:0;font-family:Arial,sans-serif;background:#f3f7f4;color:#173628}
+header{background:#08783b;color:white;padding:18px 5%;display:flex;justify-content:space-between;gap:12px;align-items:center}
+header a{color:white;text-decoration:none;font-weight:bold}
+main{max-width:900px;margin:30px auto;padding:0 16px}
+.panel{background:white;border:1px solid #e1eae3;border-radius:14px;padding:22px;margin:18px 0}
+.row{display:flex;gap:12px;flex-wrap:wrap;align-items:center}
+select{padding:11px;border:1px solid #d6e2d9;border-radius:8px;background:white}
+button{border:0;border-radius:8px;background:#08783b;color:white;padding:12px 17px;font-weight:bold;cursor:pointer}
+button:disabled{opacity:.5}
+.secondary{background:#e8f4ec;color:#08783b}
+.muted{color:#68796e;line-height:1.6}
+.question{font-size:18px;line-height:1.6;margin:18px 0}
+.option{display:block;width:100%;text-align:left;background:#f6faf7;color:#173628;border:1px solid #dfe9e2;margin:9px 0;padding:14px;border-radius:9px;font-weight:normal}
+.option.selected{border:2px solid #08783b;background:#e8f4ec}
+.option.correct{background:#d8f4df;border-color:#178342}
+.option.wrong{background:#ffe5e5;border-color:#c93b3b}
+#feedback{line-height:1.6;margin-top:15px}
+#progress{font-weight:bold;color:#08783b}
+#timer{font-size:23px;font-weight:bold}
+@media(max-width:500px){.panel{padding:16px}header{padding:16px} .question{font-size:16px}}
+</style>
+</head>
+<body>
+<header>
+  <strong>CampusGenius CBT Practice</strong>
+  <a href="dashboard.html">← Dashboard</a>
+</header>
+<main>
+  <h1>JAMB CBT Practice 📝</h1>
+  <p class="muted">Practise with sample questions, check your answers and review your score. This first version uses demonstration questions, not a verified official JAMB past-question archive.</p>
+
+  <section class="panel">
+    <div class="row">
+      <label for="subject"><strong>Subject:</strong></label>
+      <select id="subject">
+        <option value="English">Use of English</option>
+        <option value="Mathematics">Mathematics</option>
+        <option value="Biology">Biology</option>
+        <option value="Chemistry">Chemistry</option>
+        <option value="Physics">Physics</option>
+      </select>
+      <button id="startButton">Start Practice</button>
+    </div>
+    <p class="muted">Choose a subject and start. Select an answer before moving to the next question.</p>
+  </section>
+
+  <section class="panel" id="quizPanel">
+    <div class="row" style="justify-content:space-between">
+      <span id="progress">Question 1 of 5</span>
+      <span id="timer">05:00</span>
+    </div>
+    <div class="question" id="question">Press “Start Practice” to begin.</div>
+    <div id="options"></div>
+    <div id="feedback" aria-live="polite"></div>
+    <div class="row" style="justify-content:space-between;margin-top:18px">
+      <button class="secondary" id="prevButton" disabled>Previous</button>
+      <button id="nextButton" disabled>Next Question →</button>
+    </div>
+  </section>
+
+  <section class="panel" id="resultPanel" hidden>
+    <h2>Practice Complete</h2>
+    <p id="score"></p>
+    <p id="review"></p>
+    <button id="retryButton">Practise Again</button>
+  </section>
+</main>
+
+<script>
+const questionBank={
+English:[
+{q:"Choose the word nearest in meaning to “diligent”.",o:["Lazy","Hardworking","Careless","Impatient"],a:1,e:"Diligent means showing care and consistent effort."},
+{q:"Choose the correctly spelt word.",o:["Accomodation","Accommodation","Acommodation","Acomodation"],a:1,e:"Accommodation is spelt with double c and double m."},
+{q:"Choose the opposite of “scarce”.",o:["Rare","Limited","Abundant","Insufficient"],a:2,e:"Abundant means available in large quantities."},
+{q:"Which word is a noun?",o:["Quickly","Honesty","Beautiful","Run"],a:1,e:"Honesty is a noun naming a quality."},
+{q:"Choose the correct sentence.",o:["She have gone home.","She has gone home.","She gone home.","She having gone home."],a:1,e:"The correct present perfect construction is “has gone”."}
+],
+Mathematics:[
+{q:"Solve: 3x + 5 = 20.",o:["3","5","7","10"],a:1,e:"3x = 20 − 5 = 15, so x = 5."},
+{q:"What is 25% of 200?",o:["25","40","50","75"],a:2,e:"25% of 200 = 0.25 × 200 = 50."},
+{q:"Find the area of a rectangle of length 8 cm and width 4 cm.",o:["12 cm²","24 cm²","32 cm²","64 cm²"],a:2,e:"Area = length × width = 8 × 4 = 32 cm²."},
+{q:"Simplify: 2² × 2³.",o:["2⁵","4⁵","2⁶","4⁶"],a:0,e:"For the same base, add the powers: 2 + 3 = 5."},
+{q:"What is the mean of 2, 4, 6 and 8?",o:["4","5","6","8"],a:1,e:"Mean = (2 + 4 + 6 + 8) ÷ 4 = 5."}
+],
+Biology:[
+{q:"Which organelle is primarily responsible for photosynthesis?",o:["Mitochondrion","Chloroplast","Nucleus","Ribosome"],a:1,e:"Chloroplasts contain chlorophyll and carry out photosynthesis."},
+{q:"The basic structural and functional unit of life is the…",o:["Tissue","Organ","Cell","System"],a:2,e:"The cell is the basic unit of life."},
+{q:"Which blood cells primarily transport oxygen?",o:["Red blood cells","Platelets","White blood cells","Plasma cells"],a:0,e:"Red blood cells contain haemoglobin, which carries oxygen."},
+{q:"Which process produces two genetically similar daughter cells?",o:["Meiosis","Mitosis","Fertilisation","Pollination"],a:1,e:"Mitosis generally produces two genetically similar daughter cells."},
+{q:"Which organism is a producer in a typical food chain?",o:["Grass","Goat","Lion","Mushroom"],a:0,e:"Grass makes its own food through photosynthesis."}
+],
+Chemistry:[
+{q:"What is the chemical symbol for sodium?",o:["So","S","Na","N"],a:2,e:"The symbol Na comes from the Latin name natrium."},
+{q:"A solution with pH 3 is generally…",o:["Acidic","Neutral","Alkaline","Always pure water"],a:0,e:"A pH below 7 is acidic under ordinary aqueous conditions."},
+{q:"What is the formula for water?",o:["CO₂","H₂O","O₂","NaCl"],a:1,e:"Water contains two hydrogen atoms and one oxygen atom."},
+{q:"Which particle has a negative charge?",o:["Proton","Neutron","Electron","Nucleus"],a:2,e:"Electrons carry a negative electric charge."},
+{q:"Which gas is required for ordinary combustion?",o:["Oxygen","Helium","Neon","Argon"],a:0,e:"Oxygen supports ordinary combustion."}
+],
+Physics:[
+{q:"What is the SI unit of force?",o:["Joule","Watt","Newton","Pascal"],a:2,e:"Force is measured in newtons (N)."},
+{q:"Speed is calculated as…",o:["Time ÷ distance","Distance ÷ time","Mass × volume","Force ÷ time"],a:1,e:"Speed = distance travelled divided by time taken."},
+{q:"Which instrument measures electric current?",o:["Voltmeter","Ammeter","Thermometer","Barometer"],a:1,e:"An ammeter measures electric current."},
+{q:"What is the approximate acceleration due to gravity near Earth's surface?",o:["0.98 m/s²","9.8 m/s²","98 m/s²","980 m/s²"],a:1,e:"The approximate value is 9.8 m/s²."},
+{q:"Energy due to motion is called…",o:["Potential energy","Chemical energy","Kinetic energy","Nuclear energy"],a:2,e:"Kinetic energy is the energy an object has due to motion."}
+]
+};
+
+let questions=[],answers=[],index=0,seconds=300,interval=null,started=false;
+const $=id=>document.getElementById(id);
+function stopTimer(){if(interval){clearInterval(interval);interval=null;}}
+function updateTimer(){
+  $("timer").textContent=String(Math.floor(seconds/60)).padStart(2,"0")+":"+String(seconds%60).padStart(2,"0");
+}
+function start(){
+  stopTimer();
+  questions=questionBank[$("subject").value];
+  answers=Array(questions.length).fill(null);
+  index=0;seconds=300;started=true;
+  $("resultPanel").hidden=true;$("quizPanel").hidden=false;
+  updateTimer();render();
+  interval=setInterval(()=>{
+    seconds--;updateTimer();
+    if(seconds<=0)finish();
+  },1000);
+}
+function render(){
+  const item=questions[index];
+  $("progress").textContent=`Question ${index+1} of ${questions.length}`;
+  $("question").textContent=item.q;
+  $("options").replaceChildren();
+  $("feedback").textContent="";
+  item.o.forEach((option,i)=>{
+    const b=document.createElement("button");
+    b.type="button";b.className="option";
+    b.textContent=String.fromCharCode(65+i)+". "+option;
+    if(answers[index]===i)b.classList.add("selected");
+    b.addEventListener("click",()=>{
+      answers[index]=i;
+      render();
+    });
+    $("options").appendChild(b);
+  });
+  $("prevButton").disabled=index===0;
+  $("nextButton").disabled=answers[index]===null;
+  $("nextButton").textContent=index===questions.length-1?"Finish Practice":"Next Question →";
+}
+function finish(){
+  stopTimer();started=false;
+  $("quizPanel").hidden=true;$("resultPanel").hidden=false;
+  const correct=questions.reduce((sum,q,i)=>sum+(answers[i]===q.a?1:0),0);
+  $("score").textContent=`Your score: ${correct} out of ${questions.length} (${Math.round(correct/questions.length*100)}%).`;
+  $("review").replaceChildren();
+  questions.forEach((q,i)=>{
+    const p=document.createElement("p");
+    p.style.lineHeight="1.5";
+    p.textContent=`${i+1}. ${q.q} Correct answer: ${String.fromCharCode(65+q.a)}. ${q.o[q.a]}. ${q.e}`;
+    $("review").appendChild(p);
+  });
+}
+$("startButton").addEventListener("click",start);
+$("prevButton").addEventListener("click",()=>{if(index>0){index--;render();}});
+$("nextButton").addEventListener("click",()=>{
+  if(answers[index]===null)return;
+  if(index===questions.length-1){finish();return;}
+  index++;render();
+});
+$("retryButton").addEventListener("click",start);
+$("quizPanel").hidden=false;
+updateTimer();
+</script>
+</body>
+</html>
