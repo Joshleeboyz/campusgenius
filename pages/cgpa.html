@@ -1,0 +1,175 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>CGPA Calculator | CampusGenius</title>
+<style>
+*{box-sizing:border-box}
+body{margin:0;font-family:Arial,sans-serif;background:#f3f7f4;color:#173628}
+header{background:#08783b;color:white;padding:18px 5%;display:flex;justify-content:space-between;align-items:center;gap:12px}
+header a{color:white;text-decoration:none;font-weight:bold}
+main{max-width:900px;margin:30px auto;padding:0 16px}
+.panel{background:white;border:1px solid #e1eae3;border-radius:13px;padding:22px;margin:18px 0}
+.muted{color:#68796e;line-height:1.6}
+table{width:100%;border-collapse:collapse;margin:14px 0}
+th,td{padding:10px 6px;text-align:left;border-bottom:1px solid #e1eae3}
+th{font-size:13px;color:#68796e}
+input,select{width:100%;padding:10px;border:1px solid #d6e2d9;border-radius:7px;font:inherit}
+button{background:#08783b;color:white;border:0;border-radius:8px;padding:11px 15px;font-weight:bold;cursor:pointer}
+button.remove{background:#a62d2d;padding:8px}
+.actions{display:flex;gap:10px;flex-wrap:wrap}
+.result{background:#e8f4ec;padding:18px;border-radius:10px;margin-top:18px}
+.big{font-size:30px;font-weight:bold;color:#08783b}
+.note{font-size:13px;color:#68796e;line-height:1.6}
+@media(max-width:550px){.panel{padding:14px}th,td{font-size:12px}input,select{padding:8px}}
+</style>
+</head>
+<body>
+<header>
+<strong>CampusGenius CGPA Calculator</strong>
+<a href="dashboard.html">← Dashboard</a>
+</header>
+
+<main>
+<h1>GPA & CGPA Calculator 🎓</h1>
+<p class="muted">Calculate semester GPA and cumulative CGPA using your courses, credit units and grades.</p>
+
+<section class="panel">
+<h2>Grading settings</h2>
+<label for="scale">Your institution's grading scale</label>
+<select id="scale">
+<option value="5">5-point scale</option>
+<option value="4">4-point scale</option>
+</select>
+<p class="note">Confirm your institution's official grading rules. This calculator uses a simple 5/4/3/2/1/0 grade-point mapping; your school may use different grade boundaries.</p>
+</section>
+
+<section class="panel">
+<h2>Enter your courses</h2>
+<div style="overflow-x:auto">
+<table>
+<thead><tr><th>Course code/name</th><th>Credit units</th><th>Grade</th><th></th></tr></thead>
+<tbody id="courses"></tbody>
+</table>
+</div>
+<div class="actions">
+<button type="button" id="add">+ Add Course</button>
+<button type="button" id="calculate">Calculate GPA</button>
+<button type="button" id="clear" style="background:#59685f">Clear</button>
+</div>
+<div class="result" id="result" aria-live="polite">
+<div class="muted">Your result will appear here.</div>
+</div>
+</section>
+
+<section class="panel">
+<h2>Calculate cumulative CGPA</h2>
+<p class="muted">If you already know your previous CGPA and completed credit units, enter them below along with this semester's results.</p>
+<label for="previousCgpa">Previous CGPA</label>
+<input id="previousCgpa" type="number" min="0" step="0.01" placeholder="e.g. 3.50">
+<label for="previousUnits" style="display:block;margin-top:14px">Previous total credit units</label>
+<input id="previousUnits" type="number" min="0" step="1" placeholder="e.g. 36">
+<button type="button" id="calculateCumulative" style="margin-top:15px">Calculate Cumulative CGPA</button>
+<div id="cumulativeResult" class="result" aria-live="polite" hidden></div>
+</section>
+
+<p class="note">Results are estimates based on the grade points and credit units entered. Always check your official student portal for your institution's recorded GPA and CGPA.</p>
+</main>
+
+<script>
+const tbody=document.getElementById("courses");
+let lastGpa=null,lastUnits=0;
+
+function addCourse(name="",units="",grade="A"){
+ const row=document.createElement("tr");
+ row.innerHTML=`
+ <td><input aria-label="Course name" placeholder="e.g. HIM 101" value=""></td>
+ <td><input aria-label="Credit units" type="number" min="1" max="30" step="1" placeholder="3"></td>
+ <td><select aria-label="Grade">
+ <option value="A">A</option><option value="B">B</option>
+ <option value="C">C</option><option value="D">D</option>
+ <option value="E">E</option><option value="F">F</option>
+ </select></td>
+ <td><button type="button" class="remove" aria-label="Remove course">×</button></td>`;
+ row.cells[0].querySelector("input").value=name;
+ row.cells[1].querySelector("input").value=units;
+ row.cells[2].querySelector("select").value=grade;
+ row.querySelector(".remove").addEventListener("click",()=>row.remove());
+ tbody.appendChild(row);
+}
+
+function getCourses(){
+ const max=Number(document.getElementById("scale").value);
+ const points={A:max,B:Math.max(0,max-1),C:Math.max(0,max-2),
+ D:Math.max(0,max-3),E:Math.max(0,max-4),F:0};
+ const rows=[...tbody.querySelectorAll("tr")];
+ let totalUnits=0,totalPoints=0;
+ for(const row of rows){
+  const name=row.cells[0].querySelector("input").value.trim();
+  const units=Number(row.cells[1].querySelector("input").value);
+  const grade=row.cells[2].querySelector("select").value;
+  if(!name||!Number.isInteger(units)||units<1){
+   throw new Error("Enter a course name and valid whole-number credit units for every row.");
+  }
+  totalUnits+=units;
+  totalPoints+=units*points[grade];
+ }
+ if(!rows.length||totalUnits===0)throw new Error("Add at least one course.");
+ return {totalUnits,totalPoints,gpa:totalPoints/totalUnits};
+}
+
+document.getElementById("add").addEventListener("click",()=>addCourse());
+document.getElementById("calculate").addEventListener("click",()=>{
+ const result=document.getElementById("result");
+ try{
+  const data=getCourses();
+  lastGpa=data.gpa;
+  lastUnits=data.totalUnits;
+  result.innerHTML=`<div class="muted">Semester GPA</div>
+  <div class="big">${data.gpa.toFixed(2)}</div>
+  <p>Total credit units: ${data.totalUnits}</p>
+  <p>Total quality points: ${data.totalPoints.toFixed(2)}</p>`;
+ }catch(e){
+  result.textContent=e.message;
+ }
+});
+
+document.getElementById("calculateCumulative").addEventListener("click",()=>{
+ const output=document.getElementById("cumulativeResult");
+ output.hidden=false;
+ try{
+  if(lastGpa===null)throw new Error("Calculate this semester's GPA first.");
+  const previousCgpaText=document.getElementById("previousCgpa").value;
+  const previousUnitsText=document.getElementById("previousUnits").value;
+  if(previousCgpaText===""||previousUnitsText==="")
+   throw new Error("Enter your previous CGPA and previous total credit units.");
+  const previousCgpa=Number(previousCgpaText);
+  const previousUnits=Number(previousUnitsText);
+  const scale=Number(document.getElementById("scale").value);
+  if(!Number.isFinite(previousCgpa)||previousCgpa<0||previousCgpa>scale||
+     !Number.isInteger(previousUnits)||previousUnits<0)
+   throw new Error("Enter valid previous CGPA and credit units.");
+  const cgpa=previousUnits===0?lastGpa:
+   ((previousCgpa*previousUnits)+(lastGpa*lastUnits))/(previousUnits+lastUnits);
+  output.textContent="Estimated cumulative CGPA: "+cgpa.toFixed(2);
+ }catch(e){
+  output.textContent=e.message;
+ }
+});
+
+document.getElementById("clear").addEventListener("click",()=>{
+ tbody.replaceChildren();
+ addCourse();
+ lastGpa=null;lastUnits=0;
+ document.getElementById("result").textContent="Enter your courses to calculate your GPA.";
+ document.getElementById("cumulativeResult").hidden=true;
+});
+
+addCourse();
+addCourse();
+addCourse();
+</script>
+</body>
+</html>
