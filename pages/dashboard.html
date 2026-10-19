@@ -1,0 +1,96 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Student Dashboard | CampusGenius</title>
+  <link rel="stylesheet" href="../css/style.css">
+  <style>
+    body { background: #f5f8f6; }
+    .dashboard { max-width: 1050px; margin: 35px auto; padding: 20px; }
+    .welcome {
+      background: #0a7f3f; color: white; padding: 28px;
+      border-radius: 14px; margin-bottom: 25px;
+    }
+    .dashboard-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 18px;
+    }
+    .dash-card {
+      background: white; padding: 22px; border-radius: 12px;
+      box-shadow: 0 3px 12px #0000000c;
+    }
+    .dash-card h2 { color: #0a7f3f; font-size: 20px; }
+    .dash-card a { color: #0a7f3f; font-weight: bold; }
+    .logout {
+      background: white; color: #0a7f3f; border: 0;
+      padding: 10px 18px; border-radius: 6px; cursor: pointer;
+      font-weight: bold;
+    }
+  </style>
+</head>
+<body>
+  <main class="dashboard">
+    <div class="welcome">
+      <h1>Welcome, <span id="studentName">Student</span>!</h1>
+      <p>Your learning journey starts here. Learn Today. Lead Tomorrow.</p>
+      <button class="logout" id="logoutButton">Log Out</button>
+    </div>
+
+    <h2>Your Student Hub</h2>
+
+    <div class="dashboard-grid">
+      <section class="dash-card">
+        <h2>Past Questions</h2>
+        <p>Prepare for your examinations with past questions.</p>
+        <a href="past-questions.html">Explore Past Questions</a>
+      </section>
+
+      <section class="dash-card">
+        <h2>CBT Practice</h2>
+        <p>Practise questions and assess your knowledge.</p>
+        <a href="cbt.html">Start CBT Practice</a>
+      </section>
+
+      <section class="dash-card">
+        <h2>Scholarships</h2>
+        <p>Discover scholarship opportunities for students.</p>
+        <a href="scholarships.html">Find Scholarships</a>
+      </section>
+
+      <section class="dash-card">
+        <h2>CGPA Calculator</h2>
+        <p>Calculate your grade point average.</p>
+        <a href="cgpa.html">Open Calculator</a>
+      </section>
+    </div>
+  </main>
+
+  <script>
+    const token = sessionStorage.getItem("campusgenius_token");
+    const studentText = sessionStorage.getItem("campusgenius_student");
+
+    if (!token || !studentText) {
+      window.location.replace("login.html");
+    } else {
+      try {
+        const student = JSON.parse(studentText);
+        document.getElementById("studentName").textContent =
+          student.full_name || "Student";
+      } catch (error) {
+        sessionStorage.removeItem("campusgenius_token");
+        sessionStorage.removeItem("campusgenius_student");
+        window.location.replace("login.html");
+      }
+    }
+
+    document.getElementById("logoutButton").addEventListener("click", () => {
+      sessionStorage.removeItem("campusgenius_token");
+      sessionStorage.removeItem("campusgenius_student");
+      window.location.replace("login.html");
+    });
+  </script>
+</body>
+</html>
