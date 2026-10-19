@@ -4,42 +4,135 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="description" content="Log in to your CampusGenius student account.">
-  <title>Login | CampusGenius</title>
+  <meta name="description" content="Create your CampusGenius student account.">
+  <title>Create Account | CampusGenius</title>
+
   <link rel="stylesheet" href="../css/style.css">
   <script src="../js/script.js" defer></script>
 </head>
+
 <body>
   <main class="form-page">
     <section class="form-card">
-      <a class="brand" href="../index.html"><span>CG</span> CampusGenius</a>
 
-      <h1>Welcome back</h1>
-      <p class="form-intro">Log in to continue your academic journey.</p>
+      <a class="brand" href="../index.html">
+        <span>CG</span>
+        CampusGenius
+      </a>
 
-      <form data-demo-form>
+      <h1>Create your account</h1>
+      <p class="form-intro">
+        Join CampusGenius and make your academic journey smarter.
+      </p>
+
+      <form id="registerForm">
+
+        <div class="form-group">
+          <label for="fullName">Full name</label>
+          <input
+            type="text"
+            id="fullName"
+            name="fullName"
+            placeholder="Enter your full name"
+            autocomplete="name"
+            required
+          >
+        </div>
+
         <div class="form-group">
           <label for="email">Email address</label>
-          <input id="email" name="email" type="email"
-                 autocomplete="email" placeholder="you@example.com" required>
+          <input
+            type="email"
+            id="email"
+            name="email"
+            placeholder="Enter your email address"
+            autocomplete="email"
+            required
+          >
         </div>
 
         <div class="form-group">
           <label for="password">Password</label>
-          <input id="password" name="password" type="password"
-                 autocomplete="current-password" placeholder="Enter your password" required>
+          <input
+            type="password"
+            id="password"
+            name="password"
+            placeholder="Create a password"
+            minlength="8"
+            autocomplete="new-password"
+            required
+          >
         </div>
 
-        <button class="btn" type="submit">Log In</button>
-        <p class="form-message" role="status" aria-live="polite"></p>
+        <div class="form-group">
+          <label for="confirmPassword">Confirm password</label>
+          <input
+            type="password"
+            id="confirmPassword"
+            name="confirmPassword"
+            placeholder="Enter your password again"
+            minlength="8"
+            autocomplete="new-password"
+            required
+          >
+        </div>
+
+        <button class="btn" type="submit">
+          Create My Account
+        </button>
+
+        <p
+          id="registerMessage"
+          class="form-message"
+          role="status"
+          aria-live="polite"
+        ></p>
+
       </form>
 
       <p class="form-bottom">
-        Don't have an account? <a href="register.html">Create one</a>
+        Already have an account?
+        <a href="login.html">Log in here</a>
       </p>
 
-      <a class="back-home" href="../index.html">← Back to homepage</a>
+      <a class="back-home" href="../index.html">
+        ← Back to homepage
+      </a>
+
     </section>
   </main>
+
+  <script>
+    const registerForm = document.getElementById("registerForm");
+    const registerMessage = document.getElementById("registerMessage");
+
+    registerForm.addEventListener("submit", function (event) {
+      event.preventDefault();
+
+      const fullName = document.getElementById("fullName").value.trim();
+      const email = document.getElementById("email").value.trim();
+      const password = document.getElementById("password").value;
+      const confirmPassword = document.getElementById("confirmPassword").value;
+
+      if (!fullName || !email || !password || !confirmPassword) {
+        registerMessage.textContent = "Please complete all fields.";
+        return;
+      }
+
+      if (password.length < 8) {
+        registerMessage.textContent =
+          "Your password must contain at least 8 characters.";
+        return;
+      }
+
+      if (password !== confirmPassword) {
+        registerMessage.textContent = "Your passwords do not match.";
+        return;
+      }
+
+      registerMessage.textContent =
+        "Your form is working, but account creation is not connected yet. Please try again after the registration backend is set up.";
+    });
+  </script>
 </body>
 </html>
