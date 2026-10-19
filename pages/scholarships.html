@@ -1,0 +1,298 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Scholarship Hub | CampusGenius</title>
+<style>
+*{box-sizing:border-box}
+body{margin:0;font-family:Arial,sans-serif;background:#f3f7f4;color:#183729}
+header{background:#08783b;color:white;padding:18px 5%;display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap}
+header a{color:white;text-decoration:none;font-weight:bold}
+main{max-width:1050px;margin:30px auto;padding:0 16px}
+h1{margin-bottom:8px}
+.muted{color:#64766a;line-height:1.6}
+.panel,.card{background:white;border:1px solid #e0e9e2;border-radius:13px;padding:20px;margin:16px 0}
+input,select,textarea{width:100%;padding:12px;border:1px solid #d4e0d7;border-radius:8px;font:inherit;background:white}
+label{display:block;font-weight:bold;font-size:14px;margin:12px 0 7px}
+button,.btn{display:inline-block;background:#08783b;color:white;border:0;border-radius:8px;padding:11px 15px;font-weight:bold;text-decoration:none;cursor:pointer;font-size:14px}
+button.secondary{background:#64766a}
+button.delete{background:#a52d2d}
+.filters{display:grid;grid-template-columns:2fr 1fr 1fr;gap:12px}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:14px}
+.card{margin:0;display:flex;flex-direction:column;gap:10px}
+.card h3{margin:0;color:#08783b}
+.tag{display:inline-block;background:#e8f4ec;color:#08783b;border-radius:20px;padding:5px 9px;font-size:12px;font-weight:bold;width:max-content}
+.card .btn{margin-top:auto;text-align:center}
+.small{font-size:12px;color:#64766a;line-height:1.5}
+.actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}
+.empty{padding:25px;text-align:center;color:#64766a;background:white;border-radius:12px}
+@media(max-width:650px){.filters{grid-template-columns:1fr}main{margin-top:20px}.panel,.card{padding:15px}}
+</style>
+</head>
+<body>
+<header>
+<strong>CampusGenius | Scholarship Hub</strong>
+<a href="dashboard.html">← Dashboard</a>
+</header>
+
+<main>
+<h1>Scholarship Hub 🎓</h1>
+<p class="muted">Discover scholarship databases, check eligibility, and keep track of opportunities you want to apply for.</p>
+
+<section class="panel">
+<h2>Find opportunities</h2>
+<div class="filters">
+<div>
+<label for="search">Search</label>
+<input id="search" placeholder="Search by name, course or country">
+</div>
+<div>
+<label for="level">Study level</label>
+<select id="level">
+<option value="all">All levels</option>
+<option value="undergraduate">Undergraduate</option>
+<option value="postgraduate">Postgraduate</option>
+<option value="all-levels">All study levels</option>
+</select>
+</div>
+<div>
+<label for="region">Destination</label>
+<select id="region">
+<option value="all">All destinations</option>
+<option value="nigeria">Nigeria</option>
+<option value="uk">United Kingdom</option>
+<option value="germany">Germany</option>
+<option value="international">International</option>
+</select>
+</div>
+</div>
+<p class="small">These are official scholarship information sources, not a guarantee that applications are currently open. Check each provider's latest eligibility rules and deadlines.</p>
+</section>
+
+<h2>Scholarship information sources</h2>
+<div class="grid" id="opportunities"></div>
+
+<section class="panel">
+<h2>Save an opportunity</h2>
+<p class="muted">Add a scholarship you find elsewhere and keep its deadline and application link on this device.</p>
+<label for="name">Scholarship name</label>
+<input id="name" placeholder="e.g. University scholarship">
+
+<label for="provider">Provider or institution</label>
+<input id="provider" placeholder="e.g. University or foundation">
+
+<label for="deadline">Application deadline</label>
+<input id="deadline" type="date">
+
+<label for="savedLink">Official application URL</label>
+<input id="savedLink" type="url" placeholder="https://...">
+
+<label for="savedLevel">Study level</label>
+<select id="savedLevel">
+<option value="undergraduate">Undergraduate</option>
+<option value="postgraduate">Postgraduate</option>
+<option value="all-levels">All levels</option>
+</select>
+
+<div class="actions">
+<button id="save">Save opportunity</button>
+<button class="secondary" id="clearForm" type="button">Clear form</button>
+</div>
+<p id="message" class="muted" aria-live="polite"></p>
+</section>
+
+<h2>My saved opportunities</h2>
+<div class="grid" id="saved"></div>
+<p class="small">Saved opportunities are stored in this browser on this device. They are not yet synced to your CampusGenius account.</p>
+</main>
+
+<script>
+const sources = [
+ {
+  name:"Federal Scholarship Board",
+  provider:"Federal Government of Nigeria",
+  description:"Check federal scholarship announcements, eligibility conditions and application instructions.",
+  level:"all-levels",region:"nigeria",
+  url:"https://education.gov.ng/"
+ },
+ {
+  name:"Commonwealth Scholarships",
+  provider:"Commonwealth Scholarship Commission",
+  description:"Explore scholarship schemes for eligible students from Commonwealth countries.",
+  level:"postgraduate",region:"uk",
+  url:"https://cscuk.fcdo.gov.uk/scholarships/"
+ },
+ {
+  name:"Chevening Scholarships",
+  provider:"UK Government",
+  description:"Review eligibility and application guidance for UK master's scholarship opportunities.",
+  level:"postgraduate",region:"uk",
+  url:"https://www.chevening.org/scholarships/"
+ },
+ {
+  name:"DAAD Scholarship Database",
+  provider:"DAAD",
+  description:"Search funding opportunities for eligible international students interested in Germany.",
+  level:"all-levels",region:"germany",
+  url:"https://www.daad.de/en/studying-in-germany/scholarships/"
+ }
+];
+
+const searchEl=document.getElementById("search");
+const levelEl=document.getElementById("level");
+const regionEl=document.getElementById("region");
+const opportunitiesEl=document.getElementById("opportunities");
+const savedEl=document.getElementById("saved");
+const messageEl=document.getElementById("message");
+const STORAGE_KEY="campusgenius_saved_scholarships";
+
+function getSaved(){
+ try{return JSON.parse(localStorage.getItem(STORAGE_KEY)||"[]")}
+ catch{return []}
+}
+
+function renderSources(){
+ const q=searchEl.value.trim().toLowerCase();
+ const level=levelEl.value;
+ const region=regionEl.value;
+ const filtered=sources.filter(s=>{
+  const text=(s.name+" "+s.provider+" "+s.description).toLowerCase();
+  const matchesText=text.includes(q);
+  const matchesLevel=level==="all"||s.level===level||s.level==="all-levels";
+  const matchesRegion=region==="all"||s.region===region||s.region==="international";
+  return matchesText&&matchesLevel&&matchesRegion;
+ });
+
+ opportunitiesEl.replaceChildren();
+
+ if(!filtered.length){
+  opportunitiesEl.innerHTML='<div class="empty">No sources match those filters. Try another search.</div>';
+  return;
+ }
+
+ filtered.forEach(s=>{
+  const card=document.createElement("article");
+  card.className="card";
+  const tag=document.createElement("span");
+  tag.className="tag";
+  tag.textContent=s.region==="nigeria"?"Nigeria":s.region==="uk"?"United Kingdom":s.region==="germany"?"Germany":"International";
+  const title=document.createElement("h3");
+  title.textContent=s.name;
+  const provider=document.createElement("strong");
+  provider.textContent=s.provider;
+  const desc=document.createElement("p");
+  desc.className="muted";
+  desc.textContent=s.description;
+  const link=document.createElement("a");
+  link.className="btn";
+  link.href=s.url;
+  link.target="_blank";
+  link.rel="noopener noreferrer";
+  link.textContent="Visit official source ↗";
+  card.append(tag,title,provider,desc,link);
+  opportunitiesEl.appendChild(card);
+ });
+}
+
+function renderSaved(){
+ const items=getSaved();
+ savedEl.replaceChildren();
+
+ if(!items.length){
+  savedEl.innerHTML='<div class="empty">You have not saved any opportunities yet.</div>';
+  return;
+ }
+
+ items.forEach(item=>{
+  const card=document.createElement("article");
+  card.className="card";
+  const title=document.createElement("h3");
+  title.textContent=item.name;
+  const provider=document.createElement("p");
+  provider.className="muted";
+  provider.textContent=item.provider||"Provider not specified";
+  const deadline=document.createElement("p");
+  deadline.textContent=item.deadline
+   ?"Deadline: "+item.deadline
+   :"Deadline not entered";
+  const level=document.createElement("span");
+  level.className="tag";
+  level.textContent=item.level==="undergraduate"?"Undergraduate":
+   item.level==="postgraduate"?"Postgraduate":"All levels";
+  card.append(title,provider,deadline,level);
+
+  if(item.url){
+   try{
+    const parsed=new URL(item.url);
+    if(parsed.protocol==="https:"||parsed.protocol==="http:"){
+     const link=document.createElement("a");
+     link.className="btn";
+     link.href=parsed.href;
+     link.target="_blank";
+     link.rel="noopener noreferrer";
+     link.textContent="Open application ↗";
+     card.appendChild(link);
+    }
+   }catch{}
+  }
+
+  const remove=document.createElement("button");
+  remove.className="delete";
+  remove.textContent="Remove";
+  remove.addEventListener("click",()=>{
+   localStorage.setItem(STORAGE_KEY,JSON.stringify(getSaved().filter(x=>x.id!==item.id)));
+   renderSaved();
+  });
+  card.appendChild(remove);
+  savedEl.appendChild(card);
+ });
+}
+
+document.getElementById("save").addEventListener("click",()=>{
+ const name=document.getElementById("name").value.trim();
+ const provider=document.getElementById("provider").value.trim();
+ const deadline=document.getElementById("deadline").value;
+ const url=document.getElementById("savedLink").value.trim();
+ const level=document.getElementById("savedLevel").value;
+
+ if(!name){
+  messageEl.textContent="Enter the scholarship name first.";
+  return;
+ }
+
+ if(url){
+  try{
+   const parsed=new URL(url);
+   if(parsed.protocol!=="https:"&&parsed.protocol!=="http:")throw new Error();
+  }catch{
+   messageEl.textContent="Enter a valid URL beginning with https:// or http://.";
+   return;
+  }
+ }
+
+ const items=getSaved();
+ items.unshift({id:Date.now().toString(),name,provider,deadline,url,level});
+ try{
+  localStorage.setItem(STORAGE_KEY,JSON.stringify(items));
+  messageEl.textContent="Opportunity saved in this browser.";
+  ["name","provider","deadline","savedLink"].forEach(id=>document.getElementById(id).value="");
+  renderSaved();
+ }catch{
+  messageEl.textContent="Could not save. Check your browser's storage settings.";
+ }
+});
+
+document.getElementById("clearForm").addEventListener("click",()=>{
+ ["name","provider","deadline","savedLink"].forEach(id=>document.getElementById(id).value="");
+ messageEl.textContent="";
+});
+
+[searchEl,levelEl,regionEl].forEach(el=>el.addEventListener("input",renderSources));
+
+renderSources();
+renderSaved();
+</script>
+</body>
+</html>
