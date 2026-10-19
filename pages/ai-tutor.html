@@ -4,317 +4,166 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>AI Tutor | CampusGenius</title>
+  <title>Free Study Assistant | CampusGenius</title>
   <style>
-    :root {
-      --green: #08783b;
-      --light: #f3f8f4;
-      --border: #dce8df;
-      --text: #203127;
-    }
-
     * { box-sizing: border-box; }
-
     body {
       margin: 0;
       font-family: Arial, sans-serif;
-      background: var(--light);
-      color: var(--text);
+      background: #f3f7f4;
+      color: #24332a;
     }
-
     header {
-      background: var(--green);
+      background: #08783b;
       color: white;
-      padding: 16px 6%;
+      padding: 18px 6%;
       display: flex;
       justify-content: space-between;
       align-items: center;
+      flex-wrap: wrap;
       gap: 12px;
-      flex-wrap: wrap;
     }
-
     header a { color: white; text-decoration: none; }
-
-    .brand { font-size: 21px; font-weight: bold; }
-
-    main {
-      max-width: 850px;
-      margin: 30px auto;
-      padding: 0 15px;
-    }
-
-    .intro { text-align: center; margin-bottom: 22px; }
-
-    .intro h1 { margin-bottom: 8px; }
-
-    .intro p { color: #5b6b60; line-height: 1.5; }
-
-    .chat {
+    main { max-width: 850px; margin: 30px auto; padding: 0 16px; }
+    .panel {
       background: white;
-      border: 1px solid var(--border);
-      border-radius: 16px;
-      overflow: hidden;
-      box-shadow: 0 5px 20px #173d2510;
+      padding: 22px;
+      border-radius: 14px;
+      box-shadow: 0 3px 14px #0000000c;
     }
-
-    .chat-top {
-      padding: 15px 18px;
-      border-bottom: 1px solid var(--border);
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      gap: 10px;
-    }
-
-    .status { color: var(--green); font-size: 13px; }
-
-    button, textarea { font: inherit; }
-
-    button {
-      cursor: pointer;
-      border: 0;
-      border-radius: 9px;
-      padding: 11px 15px;
-    }
-
-    .clear {
-      background: #edf3ee;
-      color: #294333;
-    }
-
-    #messages {
-      height: 420px;
+    h1 { margin-top: 0; color: #08783b; }
+    .notice { color: #526258; line-height: 1.6; }
+    #chat {
+      height: 350px;
       overflow-y: auto;
-      padding: 18px;
-      display: flex;
-      flex-direction: column;
-      gap: 14px;
-    }
-
-    .message {
-      max-width: 88%;
-      padding: 13px 15px;
-      border-radius: 13px;
-      line-height: 1.6;
-      overflow-wrap: anywhere;
-      white-space: pre-wrap;
-    }
-
-    .assistant {
-      background: #eef5ef;
-      align-self: flex-start;
-    }
-
-    .user {
-      background: var(--green);
-      color: white;
-      align-self: flex-end;
-    }
-
-    .suggestions {
-      padding: 0 18px 15px;
-      display: flex;
-      flex-wrap: wrap;
-      gap: 8px;
-    }
-
-    .suggestions button {
-      background: #f1f7f2;
-      border: 1px solid var(--border);
-      color: var(--green);
-      font-size: 13px;
-    }
-
-    .composer {
-      border-top: 1px solid var(--border);
+      border: 1px solid #dce6de;
+      border-radius: 10px;
       padding: 14px;
-      display: flex;
-      gap: 10px;
-      align-items: flex-end;
+      margin: 18px 0;
+      background: #fbfdfb;
     }
-
+    .message {
+      white-space: pre-wrap;
+      overflow-wrap: anywhere;
+      padding: 12px;
+      border-radius: 10px;
+      margin: 10px 0;
+      line-height: 1.5;
+    }
+    .assistant { background: #e8f5ec; }
+    .user { background: #e8eefb; margin-left: 12%; }
+    form { display: flex; gap: 8px; }
     textarea {
       flex: 1;
       min-width: 0;
-      min-height: 48px;
-      max-height: 140px;
+      padding: 12px;
+      border: 1px solid #bdcfc1;
+      border-radius: 8px;
       resize: vertical;
-      padding: 13px;
-      border: 1px solid #cad8ce;
-      border-radius: 10px;
-      outline-color: var(--green);
+      font: inherit;
     }
-
-    .send {
-      background: var(--green);
+    button {
+      background: #08783b;
       color: white;
-      min-width: 80px;
+      border: 0;
+      border-radius: 8px;
+      padding: 12px 17px;
+      cursor: pointer;
+      font-weight: bold;
     }
-
-    .send:disabled { opacity: 0.6; cursor: wait; }
-
-    #notice {
-      padding: 0 16px 14px;
-      color: #a33c2f;
-      font-size: 13px;
-      line-height: 1.5;
-    }
-
-    .note {
-      color: #68786d;
-      text-align: center;
-      font-size: 12px;
-      line-height: 1.5;
-      margin: 15px 0;
-    }
-
-    @media (max-width: 500px) {
-      #messages { height: 55vh; }
-      .message { max-width: 95%; }
-      .send { min-width: 65px; }
+    button:hover { background: #065e2e; }
+    .suggestions { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 14px; }
+    .suggestions button { background: #e3f1e7; color: #075b2d; }
+    .clear { background: #59675e; margin-top: 12px; }
+    footer { text-align: center; padding: 25px; color: #637067; }
+    @media(max-width: 520px) {
+      form { flex-direction: column; }
+      form button { width: 100%; }
+      #chat { height: 320px; }
     }
   </style>
 </head>
 <body>
   <header>
-    <a class="brand" href="../index.html">CampusGenius</a>
-    <a href="dashboard.html">← Back to Dashboard</a>
+    <strong>CampusGenius</strong>
+    <a href="../index.html">Home</a>
   </header>
 
   <main>
-    <section class="intro">
-      <h1>🎓 Your AI Tutor</h1>
-      <p>Ask questions, understand difficult topics, and get step-by-step explanations.</p>
-    </section>
-
-    <section class="chat">
-      <div class="chat-top">
-        <div>
-          <strong>CampusGenius Study Assistant</strong><br>
-          <span class="status">● Ready to help you learn</span>
-        </div>
-        <button class="clear" id="clearBtn" type="button">Clear chat</button>
-      </div>
-
-      <div id="messages" aria-live="polite">
-        <div class="message assistant">Hello! 👋 Welcome to your AI Tutor.
-
-What subject or topic would you like help with today?
-
-You can ask me to explain a concept, solve a practice question, or help you prepare for an examination.</div>
-      </div>
+    <section class="panel">
+      <h1>Free Study Assistant</h1>
+      <p class="notice">
+        Ask a study question. This free version uses prepared educational
+        explanations and does not require paid API access. It cannot answer
+        every question like a full AI model.
+      </p>
 
       <div class="suggestions">
-        <button type="button" data-question="Explain photosynthesis step by step.">Explain a topic</button>
-        <button type="button" data-question="Give me five practice questions on biology with answers and explanations.">Practice questions</button>
-        <button type="button" data-question="Teach me how to calculate percentages, with examples.">Solve a problem</button>
+        <button type="button" data-question="Explain photosynthesis">Photosynthesis</button>
+        <button type="button" data-question="Explain the human heart">Human heart</button>
+        <button type="button" data-question="What is Health Information Management?">Health Information Management</button>
+        <button type="button" data-question="How do I calculate CGPA?">CGPA</button>
       </div>
 
-      <form class="composer" id="chatForm">
-        <textarea id="question" maxlength="4000"
-          placeholder="Type your question here..." required
-          aria-label="Your question"></textarea>
-        <button class="send" id="sendBtn" type="submit">Send</button>
-      </form>
-      <div id="notice" role="status"></div>
-    </section>
+      <div id="chat" aria-live="polite">
+        <div class="message assistant">Hello! Choose a topic above or type a question to begin.</div>
+      </div>
 
-    <p class="note">
-      AI answers can contain mistakes. Check important academic information
-      against your lecturer's notes and trusted learning materials.
-    </p>
+      <form id="question-form">
+        <textarea id="question" rows="2" maxlength="1000"
+          placeholder="Type your study question..." required></textarea>
+        <button type="submit">Ask</button>
+      </form>
+
+      <button class="clear" type="button" id="clear-chat">Clear chat</button>
+    </section>
   </main>
 
+  <footer>CampusGenius — Learn Today. Lead Tomorrow.</footer>
+
+  <script src="../js/study-assistant.js"></script>
   <script>
-    const API_URL = "https://campusgenius.onrender.com";
-    const messages = document.getElementById("messages");
-    const form = document.getElementById("chatForm");
+    const form = document.getElementById("question-form");
     const input = document.getElementById("question");
-    const sendBtn = document.getElementById("sendBtn");
-    const notice = document.getElementById("notice");
-    const clearBtn = document.getElementById("clearBtn");
+    const chat = document.getElementById("chat");
 
     function addMessage(text, type) {
-      const bubble = document.createElement("div");
-      bubble.className = "message " + type;
-      bubble.textContent = text;
-      messages.appendChild(bubble);
-      messages.scrollTop = messages.scrollHeight;
-      return bubble;
+      const message = document.createElement("div");
+      message.className = "message " + type;
+      message.textContent = text;
+      chat.appendChild(message);
+      chat.scrollTop = chat.scrollHeight;
     }
 
-    function showWelcome() {
-      addMessage(
-        "Hello! 👋 Welcome to your AI Tutor.\n\nWhat subject or topic would you like help with today?\n\nYou can ask me to explain a concept, solve a practice question, or help you prepare for an examination.",
-        "assistant"
-      );
+    function askQuestion(question) {
+      const cleanQuestion = question.trim();
+      if (!cleanQuestion) return;
+
+      addMessage(cleanQuestion, "user");
+
+      const answer = window.CampusGeniusStudyAssistant
+        ? window.CampusGeniusStudyAssistant.findStudyAnswer(cleanQuestion)
+        : "The study library could not load. Please refresh the page and try again.";
+
+      addMessage(answer, "assistant");
     }
 
-    clearBtn.addEventListener("click", () => {
-      messages.replaceChildren();
-      notice.textContent = "";
-      showWelcome();
+    form.addEventListener("submit", function(event) {
+      event.preventDefault();
+      askQuestion(input.value);
+      input.value = "";
+      input.focus();
     });
 
     document.querySelectorAll("[data-question]").forEach(button => {
-      button.addEventListener("click", () => {
-        input.value = button.dataset.question;
-        input.focus();
+      button.addEventListener("click", function() {
+        askQuestion(button.dataset.question);
       });
     });
 
-    form.addEventListener("submit", async event => {
-      event.preventDefault();
-
-      const question = input.value.trim();
-      if (!question || sendBtn.disabled) return;
-
-      const token = sessionStorage.getItem("campusgenius_token");
-
-      if (!token) {
-        notice.textContent = "Please log in first to use the AI Tutor.";
-        return;
-      }
-
-      addMessage(question, "user");
-      input.value = "";
-      notice.textContent = "";
-      sendBtn.disabled = true;
-      sendBtn.textContent = "Thinking...";
-
-      const waiting = addMessage("Preparing your answer. Please wait...", "assistant");
-
-      try {
-        const response = await fetch(API_URL + "/api/ai-tutor", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            "Authorization": "Bearer " + token
-          },
-          body: JSON.stringify({ question })
-        });
-
-        const data = await response.json().catch(() => ({}));
-
-        if (!response.ok) {
-          if (response.status === 401 || response.status === 403) {
-            throw new Error("Your login may have expired. Please log in again.");
-          }
-          if (response.status === 429) {
-            throw new Error("Too many requests. Please wait a little and try again.");
-          }
-          throw new Error(data.error || data.message || "The AI Tutor could not answer. Please try again.");
-        }
-
-        waiting.textContent = data.answer || "No answer was returned. Please try again.";
-      } catch (error) {
-        waiting.textContent = "I couldn't get an answer this time.";
-        notice.textContent = error.message || "Check your internet connection and try again.";
-      } finally {
-        sendBtn.disabled = false;
-        sendBtn.textContent = "Send";
-        input.focus();
-      }
+    document.getElementById("clear-chat").addEventListener("click", function() {
+      chat.replaceChildren();
+      addMessage("Chat cleared. What would you like to study?", "assistant");
     });
   </script>
 </body>
